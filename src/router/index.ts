@@ -1,4 +1,4 @@
-ï»¿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { storage } from '@/utils/storage'
 
 const router = createRouter({
@@ -12,19 +12,19 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/auth/LoginView.vue'),
-      meta: { title: 'Login', guest: true }
+      meta: { title: 'µÇÂ¼', guest: true }
     },
     {
       path: '/register',
       name: 'Register',
       component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { title: 'Register', guest: true }
+      meta: { title: '×¢²á', guest: true }
     },
     {
       path: '/home',
       name: 'Home',
-      component: () => import('@/views/home/HomeView.vue'),
-      meta: { title: 'Home', requiresAuth: true }
+      component: () => import('@/components/ai-home/AiHomePage.vue'),
+      meta: { title: 'Ê×Ò³', requiresAuth: true }
     }
   ]
 })

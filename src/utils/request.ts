@@ -1,4 +1,4 @@
-锘縤mport axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { showToast } from 'vant'
 import { storage } from './storage'
 import type { ApiResponse } from '@/types'
@@ -26,7 +26,7 @@ request.interceptors.response.use(
   response => {
     const data = response.data as ApiResponse
     if (data.code !== 0) {
-      showToast(data.message || 'Request failed')
+      showToast(data.message || '请求失败')
       return Promise.reject(new Error(data.message))
     }
     return response
@@ -36,26 +36,26 @@ request.interceptors.response.use(
       const status = error.response.status
       switch (status) {
         case 401:
-          showToast('Login expired, please login again')
+          showToast('登录已过期，请重新登录')
           storage.removeToken()
           window.location.href = '/login'
           break
         case 403:
-          showToast('No permission')
+          showToast('没有权限')
           break
         case 404:
-          showToast('Resource not found')
+          showToast('资源不存在')
           break
         case 500:
-          showToast('Server error')
+          showToast('服务器错误')
           break
         default:
-          showToast(`Error: ${status}`)
+          showToast(`错误: ${status}`)
       }
     } else if (error.message.includes('Network Error')) {
-      showToast('Network error, please check connection')
+      showToast('网络错误，请检查连接')
     } else {
-      showToast('Unknown error')
+      showToast('未知错误')
     }
     return Promise.reject(error)
   }

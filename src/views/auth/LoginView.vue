@@ -1,4 +1,4 @@
-Ôªø<script setup lang="ts">
+<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -18,11 +18,11 @@ const form = reactive<LoginForm>({
 
 async function handleLogin() {
   if (!form.username.trim()) {
-    showToast('Please enter username')
+    showToast('«Î ‰»Î”√ªß√˚')
     return
   }
   if (!form.password.trim()) {
-    showToast('Please enter password')
+    showToast('«Î ‰»Î√‹¬Î')
     return
   }
 
@@ -58,28 +58,28 @@ function goRegister() {
         </svg>
       </div>
       <h1 class="login-page__title">Android Agent</h1>
-      <p class="login-page__subtitle">Enterprise AI Development Platform</p>
+      <p class="login-page__subtitle">∆Û“µº∂ AI ø™∑¢∆ΩÃ®</p>
     </div>
 
     <GlassCard class="login-page__card">
-      <h2 class="login-page__card-title">Welcome Back</h2>
+      <h2 class="login-page__card-title">ª∂”≠ªÿ¿¥</h2>
 
       <van-form @submit="handleLogin">
         <van-field
           v-model="form.username"
           name="username"
-          label="Username"
-          placeholder="Enter username"
-          :rules="[{ required: true, message: 'Username is required' }]"
+          label="”√ªß√˚"
+          placeholder="«Î ‰»Î”√ªß√˚"
+          :rules="[{ required: true, message: '«Î ‰»Î”√ªß√˚' }]"
           clearable
         />
         <van-field
           v-model="form.password"
           type="password"
           name="password"
-          label="Password"
-          placeholder="Enter password"
-          :rules="[{ required: true, message: 'Password is required' }]"
+          label="√‹¬Î"
+          placeholder="«Î ‰»Î√‹¬Î"
+          :rules="[{ required: true, message: '«Î ‰»Î√‹¬Î' }]"
           clearable
         />
 
@@ -90,16 +90,16 @@ function goRegister() {
             type="primary"
             native-type="submit"
             :loading="loading"
-            loading-text="Logging in..."
+            loading-text="µ«¬º÷–..."
           >
-            Login
+            µ«¬º
           </van-button>
         </div>
       </van-form>
 
       <div class="login-page__footer">
-        <span>Don't have an account?</span>
-        <button class="login-page__link" @click="goRegister">Register</button>
+        <span>ªπ√ª”–’À∫≈£ø</span>
+        <button class="login-page__link" @click="goRegister">¡¢º¥◊¢≤·</button>
       </div>
     </GlassCard>
   </div>

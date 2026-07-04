@@ -1,4 +1,4 @@
-锘縤mport { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { UserInfo, LoginForm, RegisterForm } from '@/types'
 import { userAPI } from '@/api'
@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = data.user
     isLoggedIn.value = true
     storage.setToken(data.token)
-    showToast('Login successful')
+    showToast('登录成功')
   }
 
   async function register(form: RegisterForm) {
@@ -27,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = data.user
     isLoggedIn.value = true
     storage.setToken(data.token)
-    showToast('Registration successful')
+    showToast('注册成功')
   }
 
   async function fetchUserInfo() {

@@ -1,4 +1,4 @@
-﻿import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 import { logger } from "./utils/logger.js"
 import path from "path"
 import { fileURLToPath } from "url"
@@ -6,7 +6,7 @@ import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, "..", "..")
-const dbUrl = "file:" + path.join(projectRoot, "dev.db").replace(/\\/g, "/")
+const dbUrl = "file:" + path.join(projectRoot, "prisma", "dev.db").replace(/\\/g, "/")
 
 export const prisma = new PrismaClient({
   datasources: { db: { url: dbUrl } },
