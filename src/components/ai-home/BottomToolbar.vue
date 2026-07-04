@@ -15,21 +15,21 @@ interface ToolbarItem {
 }
 
 const workItems: ToolbarItem[] = [
-  { id: "web-search", label: "Web Search" },
-  { id: "image-gen", label: "Image Gen" },
-  { id: "files", label: "Files" },
-  { id: "code", label: "Code" },
-  { id: "history", label: "History" },
-  { id: "settings", label: "Settings" }
+  { id: "web-search", label: "搜索" },
+  { id: "image-gen", label: "绘图" },
+  { id: "files", label: "文件" },
+  { id: "code", label: "代码" },
+  { id: "history", label: "历史" },
+  { id: "settings", label: "设置" }
 ]
 
 const codeItems: ToolbarItem[] = [
   { id: "github", label: "GitHub" },
-  { id: "debug", label: "Debug" },
-  { id: "terminal", label: "Terminal" },
-  { id: "review", label: "Review" },
-  { id: "deploy", label: "Deploy" },
-  { id: "docs", label: "Docs" }
+  { id: "debug", label: "调试" },
+  { id: "terminal", label: "终端" },
+  { id: "review", label: "审查" },
+  { id: "deploy", label: "部署" },
+  { id: "docs", label: "文档" }
 ]
 
 const toolbarItems = computed(() =>
@@ -42,7 +42,7 @@ function handleSelect(id: string) {
 </script>
 
 <template>
-  <div class="toolbar" role="toolbar" :aria-label="mode + ' mode toolbar'">
+  <div class="toolbar" role="toolbar" :aria-label="mode === 'work' ? '工作模式工具栏' : '代码模式工具栏'">
     <button
       v-for="item in toolbarItems"
       :key="item.id"

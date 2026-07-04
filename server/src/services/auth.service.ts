@@ -20,9 +20,9 @@ export const authService = {
     })
     if (existing) {
       if (existing.username === username) {
-        throw new AppError('Username already exists', -11)
+        throw new AppError('用户名已存在', -11)
       }
-      throw new AppError('Email already exists', -12)
+      throw new AppError('邮箱已被注册', -12)
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -40,12 +40,12 @@ export const authService = {
 
     const user = await prisma.user.findUnique({ where: { username } })
     if (!user) {
-      throw new AppError('Invalid username or password', -13)
+      throw new AppError('用户名或密码错误', -13)
     }
 
     const isValid = await bcrypt.compare(password, user.password)
     if (!isValid) {
-      throw new AppError('Invalid username or password', -13)
+      throw new AppError('用户名或密码错误', -13)
     }
 
     const token = generateToken({ userId: user.id, username: user.username })
@@ -59,7 +59,7 @@ export const authService = {
       select: { id: true, username: true, email: true, avatar: true, createdAt: true, updatedAt: true }
     })
     if (!user) {
-      throw new AppError('User not found', -14)
+      throw new AppError('用户不存在', -14)
     }
     return user
   },

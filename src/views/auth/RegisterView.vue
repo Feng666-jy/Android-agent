@@ -1,4 +1,4 @@
-ï»¿<script setup lang="ts">
+<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -21,20 +21,20 @@ const confirmPassword = ref('')
 
 async function handleRegister() {
   if (!form.username.trim() || form.username.length < 3) {
-    showToast('Username must be at least 3 characters')
+    showToast('ÓÃ»§ÃûÖÁÉÙ 3 ¸ö×Ö·û')
     return
   }
   if (!form.password.trim() || form.password.length < 6) {
-    showToast('Password must be at least 6 characters')
+    showToast('ÃÜÂëÖÁÉÙ 6 ¸ö×Ö·û')
     return
   }
   if (form.password !== confirmPassword.value) {
-    showToast('Passwords do not match')
+    showToast('Á½´ÎÃÜÂëÊäÈë²»Ò»ÖÂ')
     return
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(form.email)) {
-    showToast('Please enter a valid email')
+    showToast('ÇëÊäÈëÓÐÐ§µÄÓÊÏäµØÖ·')
     return
   }
 
@@ -69,30 +69,30 @@ function goLogin() {
           <path d="M20 32l8 8 16-16" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h1 class="register-page__title">Create Account</h1>
-      <p class="register-page__subtitle">Join the platform</p>
+      <h1 class="register-page__title">´´½¨ÕËºÅ</h1>
+      <p class="register-page__subtitle">¼ÓÈëÆ½Ì¨</p>
     </div>
 
     <GlassCard class="register-page__card">
-      <h2 class="register-page__card-title">Sign Up</h2>
+      <h2 class="register-page__card-title">×¢²á</h2>
 
       <van-form @submit="handleRegister">
         <van-field
           v-model="form.username"
           name="username"
-          label="Username"
-          placeholder="At least 3 characters"
-          :rules="[{ required: true, message: 'Username is required' }]"
+          label="ÓÃ»§Ãû"
+          placeholder="ÖÁÉÙ 3 ¸ö×Ö·û"
+          :rules="[{ required: true, message: 'ÇëÊäÈëÓÃ»§Ãû' }]"
           clearable
         />
         <van-field
           v-model="form.email"
           name="email"
-          label="Email"
-          placeholder="Enter email address"
+          label="ÓÊÏä"
+          placeholder="ÇëÊäÈëÓÊÏäµØÖ·"
           :rules="[
-            { required: true, message: 'Email is required' },
-            { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email' }
+            { required: true, message: 'ÇëÊäÈëÓÊÏä' },
+            { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'ÓÊÏä¸ñÊ½²»ÕýÈ·' }
           ]"
           clearable
         />
@@ -100,18 +100,18 @@ function goLogin() {
           v-model="form.password"
           type="password"
           name="password"
-          label="Password"
-          placeholder="At least 6 characters"
-          :rules="[{ required: true, message: 'Password is required' }]"
+          label="ÃÜÂë"
+          placeholder="ÖÁÉÙ 6 ¸ö×Ö·û"
+          :rules="[{ required: true, message: 'ÇëÊäÈëÃÜÂë' }]"
           clearable
         />
         <van-field
           v-model="confirmPassword"
           type="password"
           name="confirmPassword"
-          label="Confirm"
-          placeholder="Confirm password"
-          :rules="[{ required: true, message: 'Please confirm password' }]"
+          label="È·ÈÏÃÜÂë"
+          placeholder="ÇëÔÙ´ÎÊäÈëÃÜÂë"
+          :rules="[{ required: true, message: 'ÇëÈ·ÈÏÃÜÂë' }]"
           clearable
         />
 
@@ -122,17 +122,17 @@ function goLogin() {
             type="primary"
             native-type="submit"
             :loading="loading"
-            loading-text="Creating account..."
+            loading-text="×¢²áÖÐ..."
             color="#07c160"
           >
-            Register
+            ×¢²á
           </van-button>
         </div>
       </van-form>
 
       <div class="register-page__footer">
-        <span>Already have an account?</span>
-        <button class="register-page__link" @click="goLogin">Login</button>
+        <span>ÒÑÓÐÕËºÅ£¿</span>
+        <button class="register-page__link" @click="goLogin">È¥µÇÂ¼</button>
       </div>
     </GlassCard>
   </div>

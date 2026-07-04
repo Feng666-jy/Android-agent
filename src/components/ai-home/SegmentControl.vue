@@ -13,7 +13,7 @@ function select(tab: "work" | "code") {
 </script>
 
 <template>
-  <div class="segment" role="tablist" aria-label="Mode switch">
+  <div class="segment" role="tablist" aria-label="模式切换">
     <div
       class="segment__slider"
       :class="modelValue === 'code' ? 'segment__slider--right' : ''"
@@ -23,20 +23,20 @@ function select(tab: "work" | "code") {
       :class="modelValue === 'work' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'work'"
-      aria-label="Work mode"
+      aria-label="工作模式"
       @click="select('work')"
     >
-      Work
+      工作
     </button>
     <button
       class="segment__item"
       :class="modelValue === 'code' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'code'"
-      aria-label="Code mode"
+      aria-label="代码模式"
       @click="select('code')"
     >
-      Code
+      代码
     </button>
   </div>
 </template>

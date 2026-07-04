@@ -12,19 +12,19 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/auth/LoginView.vue'),
-      meta: { title: 'Login', guest: true }
+      meta: { title: 'µÇÂ¼', guest: true }
     },
     {
       path: '/register',
       name: 'Register',
       component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { title: 'Register', guest: true }
+      meta: { title: '×¢²á', guest: true }
     },
     {
       path: '/home',
       name: 'Home',
       component: () => import('@/components/ai-home/AiHomePage.vue'),
-      meta: { title: 'Home', requiresAuth: true }
+      meta: { title: 'Ê×Ò³', requiresAuth: true }
     }
   ]
 })

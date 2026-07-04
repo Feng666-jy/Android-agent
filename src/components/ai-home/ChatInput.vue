@@ -31,13 +31,13 @@ function onKeydown(e: KeyboardEvent) {
       <textarea
         v-model="inputValue"
         class="chat-input__textarea"
-        placeholder="How can I help you today?"
+        placeholder="今天有什么可以帮你的？"
         rows="1"
         @keydown="onKeydown"
       />
       <button
         class="chat-input__send"
-        aria-label="Send message"
+        aria-label="发送消息"
         :disabled="!inputValue.trim()"
         @click="handleSend"
       >
