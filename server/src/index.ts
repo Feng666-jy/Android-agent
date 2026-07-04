@@ -1,0 +1,42 @@
+﻿import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import helmet from 'helmet'
+import morgan from 'morgan'
+import { logger } from './utils/logger.js'
+import routes from './routes/index.js'
+import { errorHandler } from './middleware/error.js'
+import { connectDatabase } from './prisma.js'
+
+const app = express()
+const PORT = parseInt(process.env.PORT || '3000', 10)
+
+app.use(helmet({ contentSecurityPolicy: false }))
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }))
+app.use(morgan('dev'))
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true }))
+
+app.use('/api', routes)
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+app.use(errorHandler)
+
+async function start(): Promise<void> {
+  await connectDatabase()
+
+  app.listen(PORT, () => {
+    logger.info(`Server running on http://localhost:${PORT}`)
+    logger.info(`Health check: http://localhost:${PORT}/health`)
+  })
+}
+
+start().catch(err => {
+  logger.error('Failed to start server:', err)
+  process.exit(1)
+})
+
+export default app

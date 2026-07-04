@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      MYSQL_DATABASE: android_agent
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: api
+    environment:
+      DATABASE_URL: mysql://root:password@db:3306/android_agent
+      JWT_SECRET: ${JWT_SECRET:-production-secret-change-me}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:

@@ -1,0 +1,63 @@
+// ===== Colors =====
+$primary-color: #1989fa;
+$primary-light: #409eff;
+$success-color: #07c160;
+$warning-color: #ff976a;
+$danger-color: #ee0a24;
+
+$text-color: #323233;
+$text-color-secondary: #969799;
+$text-color-light: #c8c9cc;
+$bg-color: #f7f8fa;
+$bg-color-white: #ffffff;
+$border-color: #ebedf0;
+
+// ===== Dark Colors =====
+$dark-bg-color: #1a1a2e;
+$dark-bg-color-card: #16213e;
+$dark-bg-color-elevated: #0f3460;
+$dark-text-color: #e0e0e0;
+$dark-text-color-secondary: #a0a0a0;
+$dark-border-color: #2a2a4a;
+
+// ===== Spacing =====
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+$spacing-xxl: 32px;
+
+// ===== Border Radius =====
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+
+// ===== Font =====
+$font-size-xs: 12px;
+$font-size-sm: 13px;
+$font-size-md: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+$font-size-xxl: 24px;
+
+// ===== Shadows =====
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+$dark-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+$dark-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+$dark-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+// ===== Transitions =====
+$transition-fast: 0.2s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.4s ease;
+
+// ===== Z-Index =====
+$z-navbar: 100;
+$z-tabbar: 200;
+$z-overlay: 300;
+$z-popup: 400;
