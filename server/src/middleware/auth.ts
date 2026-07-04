@@ -1,4 +1,4 @@
-﻿import type { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import type { JwtPayload } from '../types/index.js'
 import { unauthorized } from '../utils/response.js'
@@ -11,7 +11,8 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret'
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set')
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization
