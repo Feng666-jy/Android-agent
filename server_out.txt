@@ -1,0 +1,11 @@
+[2026-07-04T16:35:04.659Z] [INFO] Database connected: file:E:/daerxia/Android-agent/prisma/dev.db
+[2026-07-04T16:35:04.663Z] [INFO] Server running on http://localhost:3000
+[2026-07-04T16:35:04.663Z] [INFO] Health check: http://localhost:3000/health
+[2026-07-04T16:35:08.131Z] [INFO] 用户注册: testuser2
+[0mPOST /api/user/register [32m200[0m 100.788 ms - 331[0m
+[0mPOST /api/user/register [33m400[0m 3.457 ms - 55[0m
+[2026-07-04T16:35:20.660Z] [INFO] 用户注册: testuser3
+[0mPOST /api/user/register [32m200[0m 76.409 ms - 331[0m
+[0mPOST /api/user/register [33m400[0m 1.918 ms - 55[0m
+
+E:\daerxia\Android-agent>
