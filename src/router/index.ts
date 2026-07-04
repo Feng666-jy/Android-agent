@@ -1,4 +1,4 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { storage } from '@/utils/storage'
 
 const router = createRouter({
@@ -23,7 +23,7 @@ const router = createRouter({
     {
       path: '/home',
       name: 'Home',
-      component: () => import('@/views/home/HomeView.vue'),
+      component: () => import('@/components/ai-home/AiHomePage.vue'),
       meta: { title: 'Home', requiresAuth: true }
     }
   ]
