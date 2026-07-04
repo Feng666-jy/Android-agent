@@ -53,7 +53,7 @@ function select(tab: "work" | "code") {
   border-radius: $ai-radius-full;
   padding: 3px;
   width: 180px;
-  margin: auto;
+  flex-shrink: 0;
 
   &__slider {
     position: absolute;
@@ -82,9 +82,9 @@ function select(tab: "work" | "code") {
     justify-content: center;
     border: none;
     background: transparent;
-    font-family: $ai-font-family;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
     font-size: $ai-font-size-button;
-    font-weight: $ai-font-weight-body;
+    font-weight: $ai-font-weight-button;
     letter-spacing: $ai-letter-spacing;
     color: $ai-text-secondary;
     cursor: pointer;
@@ -94,7 +94,6 @@ function select(tab: "work" | "code") {
 
     &--active {
       color: $ai-text-primary;
-      font-weight: $ai-font-weight-button;
     }
   }
 }

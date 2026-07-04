@@ -1,42 +1,86 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
-import { storage } from '@/utils/storage'
+﻿import { createRouter, createWebHistory } from "vue-router"
+import { storage } from "@/utils/storage"
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      redirect: '/home'
+      path: "/",
+      redirect: "/home"
     },
     {
-      path: '/login',
-      name: 'Login',
-      component: () => import('@/views/auth/LoginView.vue'),
-      meta: { title: '登录', guest: true }
+      path: "/login",
+      name: "Login",
+      component: () => import("@/views/auth/LoginView.vue"),
+      meta: { title: "登录", guest: true }
     },
     {
-      path: '/register',
-      name: 'Register',
-      component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { title: '注册', guest: true }
+      path: "/register",
+      name: "Register",
+      component: () => import("@/views/auth/RegisterView.vue"),
+      meta: { title: "注册", guest: true }
     },
     {
-      path: '/home',
-      name: 'Home',
-      component: () => import('@/components/ai-home/AiHomePage.vue'),
-      meta: { title: '首页', requiresAuth: true }
+      path: "/home",
+      name: "Home",
+      component: () => import("@/components/ai-home/AiHomePage.vue"),
+      meta: { title: "首页", requiresAuth: true }
+    },
+    {
+      path: "/workspace",
+      component: () => import("@/layouts/TabLayout.vue"),
+      meta: { requiresAuth: true },
+      redirect: "/workspace/search",
+      children: [
+        {
+          path: "search",
+          name: "search",
+          component: () => import("@/views/SearchView.vue"),
+          meta: { title: "搜索" }
+        },
+        {
+          path: "image",
+          name: "image",
+          component: () => import("@/views/ImageView.vue"),
+          meta: { title: "绘图" }
+        },
+        {
+          path: "files",
+          name: "files",
+          component: () => import("@/views/FilesView.vue"),
+          meta: { title: "文件" }
+        },
+        {
+          path: "code",
+          name: "code",
+          component: () => import("@/views/CodeView.vue"),
+          meta: { title: "代码" }
+        },
+        {
+          path: "history",
+          name: "history",
+          component: () => import("@/views/HistoryView.vue"),
+          meta: { title: "历史" }
+        },
+        {
+          path: "settings",
+          name: "settings",
+          component: () => import("@/views/SettingsView.vue"),
+          meta: { title: "设置" }
+        }
+      ]
     }
   ]
 })
 
 router.beforeEach((to, _from, next) => {
-  document.title = (to.meta.title || 'App') + ' - Android Agent'
+  document.title = (to.meta.title || "App") + " - Android Agent"
   const token = storage.getToken()
 
   if (to.meta.requiresAuth && !token) {
-    next('/login')
+    next("/login")
   } else if (to.meta.guest && token) {
-    next('/home')
+    next("/home")
   } else {
     next()
   }

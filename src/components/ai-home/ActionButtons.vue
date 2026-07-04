@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 const actions = [
   {
     id: "deepseek",
@@ -35,8 +35,8 @@ function handleSelect(id: string) {
       <svg
         v-if="action.id === 'deepseek'"
         class="action-buttons__icon"
-        width="16"
-        height="16"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -50,8 +50,8 @@ function handleSelect(id: string) {
       <svg
         v-else-if="action.id === 'claude'"
         class="action-buttons__icon"
-        width="16"
-        height="16"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -66,8 +66,8 @@ function handleSelect(id: string) {
       <svg
         v-else
         class="action-buttons__icon"
-        width="16"
-        height="16"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -95,7 +95,7 @@ function handleSelect(id: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     height: $ai-button-height;
     padding: 0 $ai-space-2;
     background: $ai-button-bg;

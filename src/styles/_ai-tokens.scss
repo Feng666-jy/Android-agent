@@ -1,9 +1,9 @@
-// ============================================
+﻿// ============================================
 // AI Home - Design Tokens (UI Reverse Engineering Spec v1.0)
 // ============================================
 
 // ----- Colors -----
-$ai-bg: #F5F5F5;
+$ai-bg: #FFFFFF;
 $ai-card-bg: #FFFFFF;
 $ai-segment-bg: #ECECEC;
 $ai-input-bg: #F7F7F7;
@@ -14,7 +14,7 @@ $ai-border: #E5E5EA;
 $ai-button-bg: #FFFFFF;
 
 // ----- Typography -----
-$ai-font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+$ai-font-family: "Inter", "HarmonyOS Sans", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
 $ai-font-size-title: 18px;
 $ai-font-size-body: 15px;
 $ai-font-size-aux: 13px;
@@ -45,11 +45,16 @@ $ai-space-6: 48px;
 
 // ----- Layout -----
 $ai-padding-horizontal: 20px;
-$ai-topbar-height: 64px;
+$ai-topbar-height: 44px;
 $ai-segment-height: 44px;
 $ai-back-button-size: 40px;
-$ai-input-height: 52px;
-$ai-toolbar-height: 48px;
-$ai-button-height: 40px;
+$ai-input-height: 58px;
+$ai-toolbar-height: 36px;
+$ai-toolbar-icon-size: 16px;
+$ai-toolbar-font-size: 11px;
+$ai-toolbar-gap: 4px;
+$ai-button-height: 30px;
 $ai-bottom-card-radius: 32px;
-$ai-bottom-card-padding: 24px;
+$ai-bottom-card-padding-h: 18px;
+$ai-bottom-card-padding-bottom: 14px;
+$ai-bottom-card-content-gap: 8px;

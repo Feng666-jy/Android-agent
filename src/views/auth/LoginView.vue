@@ -1,35 +1,34 @@
 ﻿<script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { showToast } from 'vant'
-import ThemeToggle from '@/components/ThemeToggle.vue'
-import GlassCard from '@/components/GlassCard.vue'
-import type { LoginForm } from '@/types'
+import { reactive, ref } from "vue"
+import { useRouter } from "vue-router"
+import { useUserStore } from "@/stores/user"
+import { showToast } from "vant"
+import GlassCard from "@/components/GlassCard.vue"
+import type { LoginForm } from "@/types"
 
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
 
 const form = reactive<LoginForm>({
-  username: '',
-  password: ''
+  username: "",
+  password: ""
 })
 
 async function handleLogin() {
   if (!form.username.trim()) {
-    showToast('请输入用户名')
+    showToast("请输入用户名")
     return
   }
   if (!form.password.trim()) {
-    showToast('请输入密码')
+    showToast("请输入密码")
     return
   }
 
   loading.value = true
   try {
     await userStore.login(form)
-    router.push('/home')
+    router.push("/home")
   } catch {
     // Error handled by interceptor
   } finally {
@@ -38,22 +37,16 @@ async function handleLogin() {
 }
 
 function goRegister() {
-  router.push('/register')
+  router.push("/register")
 }
 </script>
 
 <template>
   <div class="login-page">
-    <div class="login-page__header">
-      <div class="login-page__theme">
-        <ThemeToggle />
-      </div>
-    </div>
-
     <div class="login-page__brand">
       <div class="login-page__logo">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <rect width="64" height="64" rx="16" fill="#1989fa" />
+        <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="16" fill="#1A1A1A" />
           <path d="M20 44V24l12 10 12-10v20" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
@@ -106,64 +99,56 @@ function goRegister() {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/variables' as *;
-@use '@/styles/mixins' as *;
+@use "@/styles/variables" as *;
 
 .login-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 0 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-
-  @include dark-mode {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  }
-
-  &__header {
-    display: flex;
-    justify-content: flex-end;
-    padding: 16px 0;
-  }
+  background: #FFFFFF;
 
   &__brand {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 0 32px;
+    margin-bottom: 32px;
   }
 
   &__logo {
     margin-bottom: 16px;
-    animation: float 3s ease-in-out infinite;
   }
 
   &__title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
-    color: white;
-    margin-bottom: 8px;
+    color: $text-color;
+    margin: 0 0 6px;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
+    color: $text-color-secondary;
+    margin: 0;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
   }
 
   &__card {
-    margin-top: 8px;
+    width: 100%;
+    max-width: 400px;
     padding: 28px 20px;
   }
 
   &__card-title {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 24px;
+    margin: 0 0 24px;
     text-align: center;
-
-    @include dark-mode {
-      color: -text-color;
-    }
+    color: $text-color;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
   }
 
   &__footer {
@@ -173,29 +158,22 @@ function goRegister() {
     gap: 6px;
     margin-top: 20px;
     font-size: 13px;
-    color: -color-secondary;
-
-    @include dark-mode {
-      color: -text-color-secondary;
-    }
+    color: $text-color-secondary;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
   }
 
   &__link {
     background: none;
     border: none;
-    color: -color;
+    color: $primary-color;
     font-size: 13px;
     cursor: pointer;
     padding: 0;
+    font-family: inherit;
 
     &:hover {
       text-decoration: underline;
     }
   }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
 }
 </style>

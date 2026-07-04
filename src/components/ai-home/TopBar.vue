@@ -1,4 +1,6 @@
 ﻿<script setup lang="ts">
+import SegmentControl from "./SegmentControl.vue"
+
 defineProps<{
   currentTab: "work" | "code"
 }>()
@@ -33,17 +35,14 @@ function onTabChange(tab: "work" | "code") {
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: $ai-topbar-height;
+  align-items: flex-start;
   width: 100%;
-  margin-top: 8px;
-  padding: 0 $ai-padding-horizontal;
+  flex-shrink: 0;
 
   &__back {
     position: absolute;
-    left: $ai-padding-horizontal;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 0;
+    top: 0;
     width: $ai-back-button-size;
     height: $ai-back-button-size;
     border-radius: $ai-radius-full;
@@ -59,11 +58,11 @@ function onTabChange(tab: "work" | "code") {
     z-index: 1;
 
     &:hover {
-      transform: translateY(-50%) scale(1.05);
+      transform: scale(1.05);
     }
 
     &:active {
-      transform: translateY(-50%) scale(0.95);
+      transform: scale(0.95);
     }
   }
 }
