@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ï»¿<script setup lang="ts">
 import { ref } from "vue"
 
 const inputValue = ref("")
@@ -31,13 +31,13 @@ function onKeydown(e: KeyboardEvent) {
       <textarea
         v-model="inputValue"
         class="chat-input__textarea"
-        placeholder="½ñÌìÓÐÊ²Ã´¿ÉÒÔ°ïÄãµÄ£¿"
+        placeholder="ä»Šå¤©æœ‰ä»€ä¹ˆå¯ä»¥å¸®ä½ çš„ï¼Ÿ"
         rows="1"
         @keydown="onKeydown"
       />
       <button
         class="chat-input__send"
-        aria-label="·¢ËÍÏûÏ¢"
+        aria-label="å‘é€æ¶ˆæ¯"
         :disabled="!inputValue.trim()"
         @click="handleSend"
       >

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ï»¿<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -21,20 +21,20 @@ const confirmPassword = ref('')
 
 async function handleRegister() {
   if (!form.username.trim() || form.username.length < 3) {
-    showToast('ÓÃ»§ÃûÖÁÉÙ 3 ¸ö×Ö·û')
+    showToast('ç”¨æˆ·åè‡³å°‘ 3 ä¸ªå­—ç¬¦')
     return
   }
   if (!form.password.trim() || form.password.length < 6) {
-    showToast('ÃÜÂëÖÁÉÙ 6 ¸ö×Ö·û')
+    showToast('å¯†ç è‡³å°‘ 6 ä¸ªå­—ç¬¦')
     return
   }
   if (form.password !== confirmPassword.value) {
-    showToast('Á½´ÎÃÜÂëÊäÈë²»Ò»ÖÂ')
+    showToast('ä¸¤æ¬¡å¯†ç è¾“å…¥ä¸ä¸€è‡´')
     return
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(form.email)) {
-    showToast('ÇëÊäÈëÓĞĞ§µÄÓÊÏäµØÖ·')
+    showToast('è¯·è¾“å…¥æœ‰æ•ˆçš„é‚®ç®±åœ°å€')
     return
   }
 
@@ -69,30 +69,30 @@ function goLogin() {
           <path d="M20 32l8 8 16-16" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h1 class="register-page__title">´´½¨ÕËºÅ</h1>
-      <p class="register-page__subtitle">¼ÓÈëÆ½Ì¨</p>
+      <h1 class="register-page__title">åˆ›å»ºè´¦å·</h1>
+      <p class="register-page__subtitle">åŠ å…¥å¹³å°</p>
     </div>
 
     <GlassCard class="register-page__card">
-      <h2 class="register-page__card-title">×¢²á</h2>
+      <h2 class="register-page__card-title">æ³¨å†Œ</h2>
 
       <van-form @submit="handleRegister">
         <van-field
           v-model="form.username"
           name="username"
-          label="ÓÃ»§Ãû"
-          placeholder="ÖÁÉÙ 3 ¸ö×Ö·û"
-          :rules="[{ required: true, message: 'ÇëÊäÈëÓÃ»§Ãû' }]"
+          label="ç”¨æˆ·å"
+          placeholder="è‡³å°‘ 3 ä¸ªå­—ç¬¦"
+          :rules="[{ required: true, message: 'è¯·è¾“å…¥ç”¨æˆ·å' }]"
           clearable
         />
         <van-field
           v-model="form.email"
           name="email"
-          label="ÓÊÏä"
-          placeholder="ÇëÊäÈëÓÊÏäµØÖ·"
+          label="é‚®ç®±"
+          placeholder="è¯·è¾“å…¥é‚®ç®±åœ°å€"
           :rules="[
-            { required: true, message: 'ÇëÊäÈëÓÊÏä' },
-            { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'ÓÊÏä¸ñÊ½²»ÕıÈ·' }
+            { required: true, message: 'è¯·è¾“å…¥é‚®ç®±' },
+            { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'é‚®ç®±æ ¼å¼ä¸æ­£ç¡®' }
           ]"
           clearable
         />
@@ -100,18 +100,18 @@ function goLogin() {
           v-model="form.password"
           type="password"
           name="password"
-          label="ÃÜÂë"
-          placeholder="ÖÁÉÙ 6 ¸ö×Ö·û"
-          :rules="[{ required: true, message: 'ÇëÊäÈëÃÜÂë' }]"
+          label="å¯†ç "
+          placeholder="è‡³å°‘ 6 ä¸ªå­—ç¬¦"
+          :rules="[{ required: true, message: 'è¯·è¾“å…¥å¯†ç ' }]"
           clearable
         />
         <van-field
           v-model="confirmPassword"
           type="password"
           name="confirmPassword"
-          label="È·ÈÏÃÜÂë"
-          placeholder="ÇëÔÙ´ÎÊäÈëÃÜÂë"
-          :rules="[{ required: true, message: 'ÇëÈ·ÈÏÃÜÂë' }]"
+          label="ç¡®è®¤å¯†ç "
+          placeholder="è¯·å†æ¬¡è¾“å…¥å¯†ç "
+          :rules="[{ required: true, message: 'è¯·ç¡®è®¤å¯†ç ' }]"
           clearable
         />
 
@@ -122,17 +122,17 @@ function goLogin() {
             type="primary"
             native-type="submit"
             :loading="loading"
-            loading-text="×¢²áÖĞ..."
+            loading-text="æ³¨å†Œä¸­..."
             color="#07c160"
           >
-            ×¢²á
+            æ³¨å†Œ
           </van-button>
         </div>
       </van-form>
 
       <div class="register-page__footer">
-        <span>ÒÑÓĞÕËºÅ£¿</span>
-        <button class="register-page__link" @click="goLogin">È¥µÇÂ¼</button>
+        <span>å·²æœ‰è´¦å·ï¼Ÿ</span>
+        <button class="register-page__link" @click="goLogin">å»ç™»å½•</button>
       </div>
     </GlassCard>
   </div>
@@ -195,7 +195,7 @@ function goLogin() {
     text-align: center;
 
     @include dark-mode {
-      color: $dark-text-color;
+      color: -text-color;
     }
   }
 
@@ -206,10 +206,10 @@ function goLogin() {
     gap: 6px;
     margin-top: 16px;
     font-size: 13px;
-    color: $text-color-secondary;
+    color: -color-secondary;
 
     @include dark-mode {
-      color: $dark-text-color-secondary;
+      color: -text-color-secondary;
     }
   }
 

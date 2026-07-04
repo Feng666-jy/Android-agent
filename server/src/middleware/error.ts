@@ -1,35 +1,32 @@
-import type { Request, Response, NextFunction } from 'express'
+ï»¿import type { Request, Response, NextFunction } from 'express'
 import { Prisma } from '@prisma/client'
 import { serverError, fail } from '../utils/response.js'
 import { logger } from '../utils/logger.js'
 
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
-  logger.error('Î´´¦ÀíµÄ´íÎó:', err.message, err.stack)
+  logger.error('æœªå¤„ç†çš„é”™è¯¯:', err.message, err.stack)
 
-  // Prisma known request errors
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     switch (err.code) {
       case 'P2002':
-        fail(res, '×ÊÔ´ÒÑ´æÔÚ', -20, 409)
+        fail(res, 'èµ„æºå·²å­˜åœ¨', -20, 409)
         return
       case 'P2025':
-        fail(res, '×ÊÔ´²»´æÔÚ', -21, 404)
+        fail(res, 'èµ„æºä¸å­˜åœ¨', -21, 404)
         return
       case 'P1001':
-        fail(res, 'Êı¾İ¿âÁ¬½ÓÊ§°Ü', -22, 503)
+        fail(res, 'æ•°æ®åº“è¿æ¥å¤±è´¥', -22, 503)
         return
       default:
-        fail(res, `Êı¾İ¿â´íÎó: ${err.code}`, -23, 500)
+        fail(res, 'æ•°æ®åº“é”™è¯¯: ' + err.code, -23, 500)
         return
     }
   }
 
-  // Prisma connection errors
   if (err instanceof Prisma.PrismaClientInitializationError) {
-    fail(res, 'Êı¾İ¿âÁ¬½ÓÊ§°Ü', -22, 503)
+    fail(res, 'æ•°æ®åº“è¿æ¥å¤±è´¥', -22, 503)
     return
   }
 
-  // Generic server error
-  serverError(res, process.env.NODE_ENV === 'production' ? '·şÎñÆ÷ÄÚ²¿´íÎó' : err.message)
+  serverError(res, process.env.NODE_ENV === 'production' ? 'æœåŠ¡å™¨å†…éƒ¨é”™è¯¯' : err.message)
 }

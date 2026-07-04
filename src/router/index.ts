@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+ï»¿import { createRouter, createWebHistory } from 'vue-router'
 import { storage } from '@/utils/storage'
 
 const router = createRouter({
@@ -12,25 +12,25 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/auth/LoginView.vue'),
-      meta: { title: 'µÇÂ¼', guest: true }
+      meta: { title: 'ç™»å½•', guest: true }
     },
     {
       path: '/register',
       name: 'Register',
       component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { title: '×¢²á', guest: true }
+      meta: { title: 'æ³¨å†Œ', guest: true }
     },
     {
       path: '/home',
       name: 'Home',
       component: () => import('@/components/ai-home/AiHomePage.vue'),
-      meta: { title: 'Ê×Ò³', requiresAuth: true }
+      meta: { title: 'é¦–é¡µ', requiresAuth: true }
     }
   ]
 })
 
 router.beforeEach((to, _from, next) => {
-  document.title = `${to.meta.title || 'App'} - Android Agent`
+  document.title = (to.meta.title || 'App') + ' - Android Agent'
   const token = storage.getToken()
 
   if (to.meta.requiresAuth && !token) {

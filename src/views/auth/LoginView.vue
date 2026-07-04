@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ï»¿<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -18,11 +18,11 @@ const form = reactive<LoginForm>({
 
 async function handleLogin() {
   if (!form.username.trim()) {
-    showToast('ÇëÊäÈëÓÃ»§Ãû')
+    showToast('è¯·è¾“å…¥ç”¨æˆ·å')
     return
   }
   if (!form.password.trim()) {
-    showToast('ÇëÊäÈëÃÜÂë')
+    showToast('è¯·è¾“å…¥å¯†ç ')
     return
   }
 
@@ -58,28 +58,28 @@ function goRegister() {
         </svg>
       </div>
       <h1 class="login-page__title">Android Agent</h1>
-      <p class="login-page__subtitle">ÆóÒµ¼¶ AI ¿ª·¢Æ½Ì¨</p>
+      <p class="login-page__subtitle">ä¼ä¸šçº§ AI å¼€å‘å¹³å°</p>
     </div>
 
     <GlassCard class="login-page__card">
-      <h2 class="login-page__card-title">»¶Ó­»ØÀ´</h2>
+      <h2 class="login-page__card-title">æ¬¢è¿å›æ¥</h2>
 
       <van-form @submit="handleLogin">
         <van-field
           v-model="form.username"
           name="username"
-          label="ÓÃ»§Ãû"
-          placeholder="ÇëÊäÈëÓÃ»§Ãû"
-          :rules="[{ required: true, message: 'ÇëÊäÈëÓÃ»§Ãû' }]"
+          label="ç”¨æˆ·å"
+          placeholder="è¯·è¾“å…¥ç”¨æˆ·å"
+          :rules="[{ required: true, message: 'è¯·è¾“å…¥ç”¨æˆ·å' }]"
           clearable
         />
         <van-field
           v-model="form.password"
           type="password"
           name="password"
-          label="ÃÜÂë"
-          placeholder="ÇëÊäÈëÃÜÂë"
-          :rules="[{ required: true, message: 'ÇëÊäÈëÃÜÂë' }]"
+          label="å¯†ç "
+          placeholder="è¯·è¾“å…¥å¯†ç "
+          :rules="[{ required: true, message: 'è¯·è¾“å…¥å¯†ç ' }]"
           clearable
         />
 
@@ -90,16 +90,16 @@ function goRegister() {
             type="primary"
             native-type="submit"
             :loading="loading"
-            loading-text="µÇÂ¼ÖĞ..."
+            loading-text="ç™»å½•ä¸­..."
           >
-            µÇÂ¼
+            ç™»å½•
           </van-button>
         </div>
       </van-form>
 
       <div class="login-page__footer">
-        <span>»¹Ã»ÓĞÕËºÅ£¿</span>
-        <button class="login-page__link" @click="goRegister">Á¢¼´×¢²á</button>
+        <span>è¿˜æ²¡æœ‰è´¦å·ï¼Ÿ</span>
+        <button class="login-page__link" @click="goRegister">ç«‹å³æ³¨å†Œ</button>
       </div>
     </GlassCard>
   </div>
@@ -162,7 +162,7 @@ function goRegister() {
     text-align: center;
 
     @include dark-mode {
-      color: $dark-text-color;
+      color: -text-color;
     }
   }
 
@@ -173,17 +173,17 @@ function goRegister() {
     gap: 6px;
     margin-top: 20px;
     font-size: 13px;
-    color: $text-color-secondary;
+    color: -color-secondary;
 
     @include dark-mode {
-      color: $dark-text-color-secondary;
+      color: -text-color-secondary;
     }
   }
 
   &__link {
     background: none;
     border: none;
-    color: $primary-color;
+    color: -color;
     font-size: 13px;
     cursor: pointer;
     padding: 0;

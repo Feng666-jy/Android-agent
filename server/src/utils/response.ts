@@ -1,7 +1,7 @@
-import type { Response } from 'express'
+ï»¿import type { Response } from 'express'
 import type { ApiResponse } from '../types/index.js'
 
-export function success<T>(res: Response, data: T, message = '³É¹¦'): void {
+export function success<T>(res: Response, data: T, message = 'æˆåŠŸ'): void {
   const body: ApiResponse<T> = { code: 0, message, data }
   res.json(body)
 }
@@ -11,18 +11,18 @@ export function fail(res: Response, message: string, code = -1, status = 400): v
   res.status(status).json(body)
 }
 
-export function unauthorized(res: Response, message = 'Î´ÊÚÈ¨'): void {
+export function unauthorized(res: Response, message = 'æœªæˆæƒ'): void {
   fail(res, message, -2, 401)
 }
 
-export function forbidden(res: Response, message = '½ûÖ¹·ÃÎÊ'): void {
+export function forbidden(res: Response, message = 'ç¦æ­¢è®¿é—®'): void {
   fail(res, message, -3, 403)
 }
 
-export function notFound(res: Response, message = 'Î´ÕÒµ½'): void {
+export function notFound(res: Response, message = 'æœªæ‰¾åˆ°'): void {
   fail(res, message, -4, 404)
 }
 
-export function serverError(res: Response, message = '·şÎñÆ÷ÄÚ²¿´íÎó'): void {
+export function serverError(res: Response, message = 'æœåŠ¡å™¨å†…éƒ¨é”™è¯¯'): void {
   fail(res, message, -5, 500)
 }

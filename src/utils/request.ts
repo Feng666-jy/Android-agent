@@ -1,4 +1,4 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
+ï»¿import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { showToast } from 'vant'
 import { storage } from './storage'
 import type { ApiResponse } from '@/types'
@@ -13,7 +13,7 @@ request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = storage.getToken()
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = 'Bearer ' + token
     }
     return config
   },
@@ -26,7 +26,7 @@ request.interceptors.response.use(
   response => {
     const data = response.data as ApiResponse
     if (data.code !== 0) {
-      showToast(data.message || 'ÇëÇóÊ§°Ü')
+      showToast(data.message || 'è¯·æ±‚å¤±è´¥')
       return Promise.reject(new Error(data.message))
     }
     return response
@@ -36,26 +36,26 @@ request.interceptors.response.use(
       const status = error.response.status
       switch (status) {
         case 401:
-          showToast('µÇÂ¼ÒÑ¹ıÆÚ£¬ÇëÖØĞÂµÇÂ¼')
+          showToast('ç™»å½•å·²è¿‡æœŸï¼Œè¯·é‡æ–°ç™»å½•')
           storage.removeToken()
           window.location.href = '/login'
           break
         case 403:
-          showToast('Ã»ÓĞÈ¨ÏŞ')
+          showToast('æ²¡æœ‰æƒé™')
           break
         case 404:
-          showToast('×ÊÔ´²»´æÔÚ')
+          showToast('èµ„æºä¸å­˜åœ¨')
           break
         case 500:
-          showToast('·şÎñÆ÷´íÎó')
+          showToast('æœåŠ¡å™¨é”™è¯¯')
           break
         default:
-          showToast(`´íÎó: ${status}`)
+          showToast('é”™è¯¯: ' + status)
       }
     } else if (error.message.includes('Network Error')) {
-      showToast('ÍøÂç´íÎó£¬Çë¼ì²éÁ¬½Ó')
+      showToast('ç½‘ç»œé”™è¯¯ï¼Œè¯·æ£€æŸ¥è¿æ¥')
     } else {
-      showToast('Î´Öª´íÎó')
+      showToast('æœªçŸ¥é”™è¯¯')
     }
     return Promise.reject(error)
   }

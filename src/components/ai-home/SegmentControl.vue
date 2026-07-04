@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ï»¿<script setup lang="ts">
 defineProps<{
   modelValue: "work" | "code"
 }>()
@@ -13,7 +13,7 @@ function select(tab: "work" | "code") {
 </script>
 
 <template>
-  <div class="segment" role="tablist" aria-label="Ä£Ê½ÇĞ»»">
+  <div class="segment" role="tablist" aria-label="æ¨¡å¼åˆ‡æ¢">
     <div
       class="segment__slider"
       :class="modelValue === 'code' ? 'segment__slider--right' : ''"
@@ -23,20 +23,20 @@ function select(tab: "work" | "code") {
       :class="modelValue === 'work' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'work'"
-      aria-label="¹¤×÷Ä£Ê½"
+      aria-label="å·¥ä½œæ¨¡å¼"
       @click="select('work')"
     >
-      ¹¤×÷
+      å·¥ä½œ
     </button>
     <button
       class="segment__item"
       :class="modelValue === 'code' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'code'"
-      aria-label="´úÂëÄ£Ê½"
+      aria-label="ä»£ç æ¨¡å¼"
       @click="select('code')"
     >
-      ´úÂë
+      ä»£ç 
     </button>
   </div>
 </template>
