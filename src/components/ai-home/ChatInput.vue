@@ -9,7 +9,8 @@ const emit = defineEmits<{
 
 function handleSend() {
   if (inputValue.value.trim()) {
-    emit("send", inputValue.value)
+    emit('send', inputValue.value)
+    inputValue.value = ''
   }
 }
 
@@ -31,13 +32,13 @@ function onKeydown(e: KeyboardEvent) {
       <textarea
         v-model="inputValue"
         class="chat-input__textarea"
-        placeholder="½ñÌìÓĞÊ²Ã´¿ÉÒÔ°ïÄãµÄ£¿"
+        placeholder="ä»Šå¤©æœ‰ä»€ä¹ˆå¯ä»¥å¸®ä½ çš„ï¼Ÿ"
         rows="1"
         @keydown="onKeydown"
       />
       <button
         class="chat-input__send"
-        aria-label="·¢ËÍÏûÏ¢"
+        aria-label="å‘é€æ¶ˆæ¯"
         :disabled="!inputValue.trim()"
         @click="handleSend"
       >

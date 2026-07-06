@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import ChatInput from "./ChatInput.vue"
 import ActionButtons from "./ActionButtons.vue"
 import BottomToolbar from "./BottomToolbar.vue"
@@ -36,20 +36,21 @@ const emit = defineEmits<{
   background: $ai-card-bg;
   border-radius: $ai-bottom-card-radius $ai-bottom-card-radius 0 0;
   box-shadow: $ai-shadow-card;
-  padding: 0 $ai-bottom-card-padding $ai-bottom-card-padding;
+  padding: 0 $ai-bottom-card-padding-h $ai-bottom-card-padding-bottom;
+  flex-shrink: 0;
 
   &__divider {
     width: 36px;
     height: 4px;
     background: $ai-border;
     border-radius: $ai-radius-full;
-    margin: $ai-space-1 auto $ai-space-2;
+    margin: 6px auto 8px;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    gap: $ai-space-2;
+    gap: $ai-bottom-card-content-gap;
   }
 }
 </style>

@@ -3,12 +3,12 @@ import jwt from 'jsonwebtoken'
 import { prisma } from '../prisma.js'
 import type { JwtPayload, RegisterInput, LoginInput } from '../types/index.js'
 
-const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET!
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set')
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
 
 function generateToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+  return jwt.sign(payload, JWT_SECRET!, { expiresIn: JWT_EXPIRES_IN as any })
 }
 
 export const authService = {
@@ -20,9 +20,9 @@ export const authService = {
     })
     if (existing) {
       if (existing.username === username) {
-        throw new AppError('ÓÃ»§ÃûÒÑ´æÔÚ', -11)
+        throw new AppError('ç”¨æˆ·åå·²å­˜åœ¨', -11)
       }
-      throw new AppError('ÓÊÏäÒÑ±»×¢²á', -12)
+      throw new AppError('é‚®ç®±å·²è¢«æ³¨å†Œ', -12)
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -40,12 +40,12 @@ export const authService = {
 
     const user = await prisma.user.findUnique({ where: { username } })
     if (!user) {
-      throw new AppError('ÓÃ»§Ãû»òÃÜÂë´íÎó', -13)
+      throw new AppError('ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯', -13)
     }
 
     const isValid = await bcrypt.compare(password, user.password)
     if (!isValid) {
-      throw new AppError('ÓÃ»§Ãû»òÃÜÂë´íÎó', -13)
+      throw new AppError('ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯', -13)
     }
 
     const token = generateToken({ userId: user.id, username: user.username })
@@ -59,7 +59,7 @@ export const authService = {
       select: { id: true, username: true, email: true, avatar: true, createdAt: true, updatedAt: true }
     })
     if (!user) {
-      throw new AppError('ÓÃ»§²»´æÔÚ', -14)
+      throw new AppError('ç”¨æˆ·ä¸å­˜åœ¨', -14)
     }
     return user
   },

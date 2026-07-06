@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = data.user
     isLoggedIn.value = true
     storage.setToken(data.token)
-    showToast('登录成功')
+    showToast('鐧诲綍鎴愬姛')
   }
 
   async function register(form: RegisterForm) {
@@ -27,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = data.user
     isLoggedIn.value = true
     storage.setToken(data.token)
-    showToast('注册成功')
+    showToast('娉ㄥ唽鎴愬姛')
   }
 
   async function fetchUserInfo() {

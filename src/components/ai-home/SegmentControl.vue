@@ -1,4 +1,4 @@
-<script setup lang="ts">
+Ôªø<script setup lang="ts">
 defineProps<{
   modelValue: "work" | "code"
 }>()
@@ -13,7 +13,7 @@ function select(tab: "work" | "code") {
 </script>
 
 <template>
-  <div class="segment" role="tablist" aria-label="ƒ£ Ω«–ªª">
+  <div class="segment" role="tablist" aria-label="Ê®°ÂºèÂàáÊç¢">
     <div
       class="segment__slider"
       :class="modelValue === 'code' ? 'segment__slider--right' : ''"
@@ -23,20 +23,20 @@ function select(tab: "work" | "code") {
       :class="modelValue === 'work' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'work'"
-      aria-label="π§◊˜ƒ£ Ω"
+      aria-label="Â∑•‰ΩúÊ®°Âºè"
       @click="select('work')"
     >
-      π§◊˜
+      Â∑•‰Ωú
     </button>
     <button
       class="segment__item"
       :class="modelValue === 'code' ? 'segment__item--active' : ''"
       role="tab"
       :aria-selected="modelValue === 'code'"
-      aria-label="¥˙¬Îƒ£ Ω"
+      aria-label="‰ª£Á†ÅÊ®°Âºè"
       @click="select('code')"
     >
-      ¥˙¬Î
+      ‰ª£Á†Å
     </button>
   </div>
 </template>
@@ -53,7 +53,7 @@ function select(tab: "work" | "code") {
   border-radius: $ai-radius-full;
   padding: 3px;
   width: 180px;
-  margin: auto;
+  flex-shrink: 0;
 
   &__slider {
     position: absolute;
@@ -82,9 +82,9 @@ function select(tab: "work" | "code") {
     justify-content: center;
     border: none;
     background: transparent;
-    font-family: $ai-font-family;
+    font-family: "Inter", "HarmonyOS Sans", sans-serif;
     font-size: $ai-font-size-button;
-    font-weight: $ai-font-weight-body;
+    font-weight: $ai-font-weight-button;
     letter-spacing: $ai-letter-spacing;
     color: $ai-text-secondary;
     cursor: pointer;
@@ -94,7 +94,6 @@ function select(tab: "work" | "code") {
 
     &--active {
       color: $ai-text-primary;
-      font-weight: $ai-font-weight-button;
     }
   }
 }
