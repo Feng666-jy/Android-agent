@@ -1,4 +1,4 @@
-﻿import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { showToast } from 'vant'
 import { storage } from './storage'
 import type { ApiResponse } from '@/types'
@@ -29,7 +29,7 @@ request.interceptors.response.use(
       showToast(data.message || '请求失败')
       return Promise.reject(new Error(data.message))
     }
-    return response
+    return data as any
   },
   (error: AxiosError) => {
     if (error.response) {

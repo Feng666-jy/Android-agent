@@ -16,3 +16,36 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model DeepseekModel {
+  id          Int      @id @default(autoincrement())
+  modelName   String
+  displayName String
+  apiProvider String
+  status      Int      @default(1)
+  sort        Int      @default(0)
+  createTime  DateTime @default(now())
+  updateTime  DateTime @updatedAt
+}
+
+model ClaudeModel {
+  id          Int      @id @default(autoincrement())
+  modelName   String
+  displayName String
+  apiProvider String
+  status      Int      @default(1)
+  sort        Int      @default(0)
+  createTime  DateTime @default(now())
+  updateTime  DateTime @updatedAt
+}
+
+model ChatgptModel {
+  id          Int      @id @default(autoincrement())
+  modelName   String
+  displayName String
+  apiProvider String
+  status      Int      @default(1)
+  sort        Int      @default(0)
+  createTime  DateTime @default(now())
+  updateTime  DateTime @updatedAt
+}

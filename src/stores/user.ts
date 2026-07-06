@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { UserInfo, LoginForm, RegisterForm } from '@/types'
 import { userAPI } from '@/api'

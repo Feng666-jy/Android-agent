@@ -1,14 +1,14 @@
-﻿import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { prisma } from '../prisma.js'
 import type { JwtPayload, RegisterInput, LoginInput } from '../types/index.js'
 
-const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET!
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set')
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
 
 function generateToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+  return jwt.sign(payload, JWT_SECRET!, { expiresIn: JWT_EXPIRES_IN as any })
 }
 
 export const authService = {

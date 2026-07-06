@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref } from "vue"
 
 const inputValue = ref("")
@@ -9,7 +9,8 @@ const emit = defineEmits<{
 
 function handleSend() {
   if (inputValue.value.trim()) {
-    emit("send", inputValue.value)
+    emit('send', inputValue.value)
+    inputValue.value = ''
   }
 }
 
