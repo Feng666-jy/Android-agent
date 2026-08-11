@@ -30,7 +30,7 @@ export interface RegisterForm {
 }
 
 export interface AiModel {
-  id: number;
+  id: string;
   modelName: string;
   displayName: string;
   apiProvider: string;
@@ -38,4 +38,7 @@ export interface AiModel {
   sort: number;
   createTime?: string;
   updateTime?: string;
+  isFavorite?: boolean;
+  isDefault?: boolean;
+  groupId?: string | null;
 }

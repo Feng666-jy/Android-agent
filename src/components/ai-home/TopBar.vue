@@ -1,4 +1,5 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
+import { useRouter } from "vue-router";
 import SegmentControl from "./SegmentControl.vue"
 
 defineProps<{
@@ -9,14 +10,20 @@ const emit = defineEmits<{
   "update:currentTab": [value: "work" | "code"]
 }>()
 
+const router = useRouter()
+
 function onTabChange(tab: "work" | "code") {
   emit("update:currentTab", tab)
+}
+
+function onBack() {
+  router.push("/personal-center")
 }
 </script>
 
 <template>
   <header class="topbar">
-    <button class="topbar__back" aria-label="返回">
+    <button class="topbar__back" aria-label="返回" @click="onBack">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6" />
       </svg>

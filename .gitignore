@@ -1,18 +1,38 @@
-﻿node_modules/
+node_modules/
 dist/
 *.log
 .env.local
 .env.production
 .DS_Store
 *.tsbuildinfo
-prisma/*.db
 # Environment
 .env
+.env.*
+!.env.example
 
 # Dev notes
 1.txt
 ds.txt
 gpt.txt
 .codex/
-dev.db
-prisma/*.db
+
+# ---- Database files (SQLite), any location ----
+# 严禁提交任何数据库文件 —— Provider 的 API key 明文/密文都可能落在 dev.db
+*.db
+*.db.backup-*
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+server/**/*.db
+prisma/**/*.db
+
+# ---- Secrets / credentials any-format ----
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/

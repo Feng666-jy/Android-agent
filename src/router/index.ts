@@ -27,6 +27,19 @@ const router = createRouter({
       meta: { title: "首页", requiresAuth: true }
     },
     {
+      path: "/personal-center",
+      name: "PersonalCenter",
+      component: () => import("@/views/personal-center/PersonalCenter.vue"),
+      meta: { title: "个人中心", requiresAuth: true }
+    },
+    {
+      path: "/me",
+      name: "Profile",
+      component: () => import("@/views/me/ProfileView.vue"),
+      meta: { title: "设置", requiresAuth: true }
+    },
+    
+    {
       path: "/workspace",
       component: () => import("@/layouts/TabLayout.vue"),
       meta: { requiresAuth: true },
@@ -66,7 +79,39 @@ const router = createRouter({
           path: "settings",
           name: "settings",
           component: () => import("@/views/SettingsView.vue"),
-          meta: { title: "设置" }
+          meta: { title: "设置" },
+          children: [
+            {
+              path: "providers",
+              name: "provider-list",
+              component: () => import("@/views/provider/ProviderList.vue"),
+              meta: { title: "供应商管理" }
+            },
+            {
+              path: "providers/new",
+              name: "provider-create",
+              component: () => import("@/views/provider/ProviderForm.vue"),
+              meta: { title: "新增供应商" }
+            },
+            {
+              path: "providers/:id",
+              name: "provider-detail",
+              component: () => import("@/views/provider/ProviderDetail.vue"),
+              meta: { title: "供应商详情" }
+            },
+            {
+              path: "providers/:id/edit",
+              name: "provider-edit",
+              component: () => import("@/views/provider/ProviderForm.vue"),
+              meta: { title: "编辑供应商" }
+            },
+            {
+              path: "models",
+              name: "model-manager",
+              component: () => import("@/views/model/ModelManager.vue"),
+              meta: { title: "模型管理" }
+            }
+          ]
         }
       ]
     }

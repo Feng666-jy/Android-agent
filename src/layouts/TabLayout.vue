@@ -15,7 +15,7 @@ const tabTitle = computed(() => {
     history: "历史",
     settings: "设置"
   }
-  return map[route.name as string] ?? ""
+  return map[route.name as string] ?? (route.meta.title as string) ?? ""
 })
 
 function goHome() {
