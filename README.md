@@ -62,8 +62,7 @@ Android Agent 是一个面向移动端的 AI Agent 平台。
 DeepSeek
 Claude
 ChatGPT
-Gemini
-```
+Gemini```
 
 ---
 
@@ -211,6 +210,12 @@ npx prisma db push
 ## 启动项目
 
 
+一键启动前后端：
+
+```bash
+npm run dev:all
+```
+
 启动前端：
 
 ```bash
@@ -302,6 +307,8 @@ Android-Agent
 
 # 🔌 API 接口
 
+添加模型从上游获取
+<img width="500" height="803" alt="image" src="https://github.com/user-attachments/assets/6dc4bb08-8b82-494c-a88c-628f18e08f42" />
 
 | 方法 | 地址 | 权限 | 描述 |
 |-|-|-|-|
