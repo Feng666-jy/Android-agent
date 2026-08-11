@@ -1,6 +1,6 @@
 # Android Agent
 
-基于 Vue3 + Express + Prisma 构建的企业级 AI 开发平台。
+基于 Vue3 + Express + node:sqlite 构建的企业级 AI 开发平台。
 
 ## 技术栈
 
@@ -16,8 +16,7 @@
 ### 后端
 - Node.js + Express
 - TypeScript
-- Prisma（ORM）
-- SQLite / MySQL
+- node:sqlite（SQLite，内置驱动，零原生依赖）
 - JWT 认证
 - Zod（校验）
 
@@ -37,8 +36,10 @@ npm install
 cp .env .env.local
 # 编辑 .env.local 配置数据库连接信息
 
-# 初始化数据库
-npx prisma db push
+# 初始化数据库（会清空重建）
+npm run db:init
+# 填充种子数据（admin/admin123, demo/test123）
+npm run db:seed
 
 # 启动开发服务器
 npm run dev:all
@@ -82,12 +83,13 @@ docker compose up -d
 ├── server/               # 后端源码
 │   └── src/
 │       ├── controllers/
+│       ├── db/            # SQLite 数据层（schema / 字段映射 / 查询构建 / 门面）
 │       ├── middleware/
 │       ├── routes/
 │       ├── services/
 │       ├── types/
 │       └── utils/
-├── prisma/               # 数据库 Schema
+├── scripts/               # db:init / db:seed 脚本
 └── docker/               # Docker 配置
 ```
 

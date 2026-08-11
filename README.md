@@ -16,8 +16,7 @@ Enterprise AI Development Platform built with Vue3 + Express + Prisma.
 ### Backend
 - Node.js + Express
 - TypeScript
-- Prisma (ORM)
-- MySQL
+- node:sqlite (built-in SQLite driver, zero native deps)
 - JWT Authentication
 - Zod (Validation)
 
@@ -37,8 +36,10 @@ npm install
 cp .env .env.local
 # Edit .env.local with your database credentials
 
-# Initialize database
-npx prisma db push
+# Init database (drops and recreates)
+npm run db:init
+# Seed demo data (admin/admin123, demo/test123)
+npm run db:seed
 
 # Start development
 npm run dev      # Frontend (port 5173)
@@ -69,12 +70,13 @@ docker compose up -d
 ├── server/           # Backend source
 │   └── src/
 │       ├── controllers/
+│       ├── db/        # SQLite data layer (schema / fieldmaps / query builder / facade)
 │       ├── middleware/
 │       ├── routes/
 │       ├── services/
 │       ├── types/
 │       └── utils/
-├── prisma/           # Database schema
+├── scripts/           # db:init / db:seed scripts
 └── docker/           # Docker configuration
 ```
 

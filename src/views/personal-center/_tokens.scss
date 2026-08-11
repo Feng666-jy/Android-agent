@@ -1,0 +1,52 @@
+// ============================================
+// Personal Center - Design Tokens
+// Based on Android UI spec (personal-center prompt)
+// ============================================
+
+// ----- Colors -----
+$pc-bg: #FFFFFF;
+$pc-title-color: #000000;
+$pc-icon-color: #111111;
+$pc-empty-color: #BDBDBD;
+$pc-empty-text-color: #7A7A7A;
+$pc-avatar-bg: #57D99C;
+$pc-avatar-icon-color: #2E7D52;
+
+// ----- FAB Gradient -----
+$pc-fab-start: #5B4CFF;
+$pc-fab-end: #4530E0;
+$pc-fab-gradient: linear-gradient(135deg, $pc-fab-start, $pc-fab-end);
+
+// ----- Typography -----
+$pc-font-family: "KaiTi", "STKaiti", "Kaiti SC", serif;
+$pc-title-size: 22px;
+$pc-title-weight: 400;
+$pc-empty-text-size: 18px;
+
+// ----- Safe Area -----
+$pc-safe-top: 40px;
+$pc-safe-side: 20px;
+
+// ----- Header -----
+$pc-header-height: 56px;
+$pc-dropdown-size: 18px;
+$pc-dropdown-gap: 6px;
+$pc-search-size: 26px;
+$pc-avatar-size: 36px;
+$pc-actions-gap: 20px;
+
+// ----- Empty State -----
+$pc-empty-icon-size: 80px;
+$pc-empty-icon-stroke: 2px;
+$pc-empty-plus-size: 36px;
+$pc-empty-text-gap: 32px;
+
+// ----- FAB -----
+$pc-fab-size: 72px;
+$pc-fab-right: 24px;
+$pc-fab-bottom: 28px;
+$pc-fab-shadow: 16px;
+$pc-fab-icon-size: 34px;
+
+// ----- Radius -----
+$pc-radius-full: 9999px;

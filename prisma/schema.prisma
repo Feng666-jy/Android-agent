@@ -1,51 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+/// Provider（供应商）— 承载连接属性
+/// 一个 Provider 可提供多个 Model
+model Provider {
+  id            String   @id @default(cuid())
+  name          String
+  baseUrl       String   @map("base_url")
+  protocol      String   @default("OPENAI_COMPATIBLE") // OPENAI_COMPATIBLE | ANTHROPIC | GOOGLE_GEMINI | OLLAMA
+  authType      String   @default("API_KEY")            // API_KEY | OAUTH | BEARER_TOKEN | NONE
+  apiKeyEncrypted String? @map("api_key_encrypted")
+  isEnabled     Boolean  @default(true) @map("is_enabled")
+  healthStatus  String   @default("UNKNOWN")            // HEALTHY | DEGRADED | UNREACHABLE | UNKNOWN
+  lastCheckedAt DateTime? @map("last_checked_at")
+  sortOrder     Int      @default(0) @map("sort_order")
+  isBuiltin     Boolean  @default(false) @map("is_builtin")
+  metadata      String?                                   // JSON map（扩展字段）
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  models        Model[]
+  healthLogs    ProviderHealthLog[]
+
+  @@index([sortOrder])
+  @@index([isEnabled])
+  @@map("providers")
 }
 
+/// Model（模型）— 承载能力声明
+/// Model 与 Provider 解耦：同一 Model 名可在不同 Provider 上运行
+model Model {
+  id                    String   @id @default(cuid())
+  providerId            String   @map("provider_id")
+  modelName             String   @map("model_name")
+  displayName           String   @map("display_name")
+  aliases               String?                                   // 逗号分隔的别名
+  description           String?
+
+  // 排序与收藏
+  isFavorite            Boolean  @default(false) @map("is_favorite")
+  sortOrder             Int      @default(0) @map("sort_order")
+  isDefault             Boolean  @default(false) @map("is_default")
+
+  // Context Window
+  contextWindow         Int      @default(32768) @map("context_window")
+  maxOutputTokens       Int      @default(4096) @map("max_output_tokens")
+  autoCompactThreshold  Int?     @map("auto_compact_threshold")
+  effectivePercent      Float    @default(0.8) @map("effective_percent")
+
+  // 采样参数
+  temperature           Float    @default(0.7)
+  topP                  Float?   @map("top_p")
+  frequencyPenalty      Float?   @map("frequency_penalty")
+  presencePenalty       Float?   @map("presence_penalty")
+
+  // 能力
+  capabilities          String?                                   // JSON array
+  reasoningBudget       Int?     @map("reasoning_budget")
+
+  // 自定义
+  promptTemplate        String?  @map("prompt_template")
+  customHeaders         String?  @map("custom_headers")           // JSON map
+  customParams          String?  @map("custom_params")            // JSON map
+
+  // 分组与标签
+  groupId               String?  @map("group_id")
+  tags                  String?                                   // JSON array
+
+  // 状态
+  isEnabled             Boolean  @default(true) @map("is_enabled")
+
+  // 扩展（未来新增字段无需迁移）
+  metadata              String?
+
+  // 时间
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // 关系
+  provider              Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  group                 ModelGroup?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  usageStats            UsageStats?
+
+  @@unique([providerId, modelName])
+  @@index([providerId])
+  @@index([groupId])
+  @@index([isFavorite])
+  @@index([isDefault])
+  @@index([sortOrder])
+  @@map("models")
+}
+
+/// ModelGroup（模型分组）
+model ModelGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  color       String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  isBuiltin   Boolean  @default(false) @map("is_builtin")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  models      Model[]
+
+  @@index([sortOrder])
+  @@index([isPinned])
+  @@map("model_groups")
+}
+
+/// UsageStats（使用统计）
+model UsageStats {
+  id                String   @id @default(cuid())
+  modelId           String   @unique @map("model_id")
+  totalRequests     Int      @default(0) @map("total_requests")
+  totalTokensInput  Int      @default(0) @map("total_tokens_input")
+  totalTokensOutput Int      @default(0) @map("total_tokens_output")
+  totalTokensCached Int      @default(0) @map("total_tokens_cached")
+  totalErrors       Int      @default(0) @map("total_errors")
+  lastUsedAt        DateTime? @map("last_used_at")
+  averageLatencyMs  Float?   @map("average_latency_ms")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  model             Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@index([lastUsedAt])
+  @@map("usage_stats")
+}
+
+/// ProviderHealthLog（Provider 健康日志）
+model ProviderHealthLog {
+  id          String   @id @default(cuid())
+  providerId  String   @map("provider_id")
+  status      String
+  latencyMs   Int?     @map("latency_ms")
+  errorMessage String? @map("error_message")
+  checkedAt   DateTime @map("checked_at")
+
+  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([checkedAt])
+  @@map("provider_health_logs")
+}
+/// User（用户）— 认证与会话
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
   email     String   @unique
   avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  agentRuns AgentRun[]
+
+  @@map("users")
 }
 
-model DeepseekModel {
-  id          Int      @id @default(autoincrement())
-  modelName   String
-  displayName String
-  apiProvider String
-  status      Int      @default(1)
-  sort        Int      @default(0)
-  createTime  DateTime @default(now())
-  updateTime  DateTime @updatedAt
+/// AgentRun（Agent 运行记录）
+model AgentRun {
+  id            String   @id
+  userId        Int      @map("user_id")
+  status        String   @default("completed") // running|completed|failed|cancelled|budget_exceeded
+  task          String
+  modelId       String   @map("model_id")
+  sandboxRoot   String   @map("sandbox_root")
+  iterations    Int      @default(0)
+  toolCallCount Int      @default(0) @map("tool_call_count")
+  result        String?
+  error         String?
+  tokenInput    Int      @default(0) @map("token_input")
+  tokenOutput   Int      @default(0) @map("token_output")
+  tokenTotal    Int      @default(0) @map("token_total")
+  createdAt     DateTime @default(now()) @map("created_at")
+  finishedAt    DateTime? @map("finished_at")
+
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     AgentMessage[]
+  toolCalls    AgentToolCall[]
+  tokenEvents  AgentTokenUsage[]
+
+  @@index([userId, createdAt])
+  @@map("agent_runs")
 }
 
-model ClaudeModel {
-  id          Int      @id @default(autoincrement())
-  modelName   String
-  displayName String
-  apiProvider String
-  status      Int      @default(1)
-  sort        Int      @default(0)
-  createTime  DateTime @default(now())
-  updateTime  DateTime @updatedAt
+/// AgentMessage（Agent 消息时间线）
+model AgentMessage {
+  id            String    @id @default(cuid())
+  runId         String    @map("run_id")
+  role          String // system|user|assistant|tool
+  content       String?
+  toolCallId    String?   @map("tool_call_id")
+  toolCallsJson String?   @map("tool_calls_json")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("agent_messages")
 }
 
-model ChatgptModel {
-  id          Int      @id @default(autoincrement())
-  modelName   String
-  displayName String
-  apiProvider String
-  status      Int      @default(1)
-  sort        Int      @default(0)
-  createTime  DateTime @default(now())
-  updateTime  DateTime @updatedAt
+/// AgentToolCall（Agent 工具调用日志）
+model AgentToolCall {
+  id            String   @id @default(cuid())
+  runId         String   @map("run_id")
+  toolCallId    String?  @map("tool_call_id")
+  name          String
+  argumentsJson String   @map("arguments_json")
+  ok            Boolean  @default(false)
+  output        String?
+  durationMs    Int      @default(0) @map("duration_ms")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("agent_tool_calls")
+}
+
+/// AgentTokenUsage（Agent 每轮 token 用量事件，事件溯源式，读时聚合）
+model AgentTokenUsage {
+  id           String   @id @default(cuid())
+  runId        String   @map("run_id")
+  turnId       Int      @default(0) @map("turn_id")
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  cachedTokens Int      @default(0) @map("cached_tokens")
+  totalTokens  Int      @default(0) @map("total_tokens")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("agent_token_usages")
 }
