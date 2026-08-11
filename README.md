@@ -1,4 +1,4 @@
-﻿# Android Agent
+# Android Agent
 
 Enterprise AI Development Platform built with Vue3 + Express + Prisma.
 
@@ -38,6 +38,8 @@ cp .env .env.local
 
 # Init database (drops and recreates)
 npm run db:init
+# Apply incremental migrations (new tables/columns, non-destructive)
+npm run db:migrate
 # Seed demo data (admin/admin123, demo/test123)
 npm run db:seed
 

@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import type { ComponentPublicInstance } from "vue";
 import ModelSelector from "@/components/ModelSelector/ModelSelector.vue";
+import type { AiModel } from "@/types";
+
+const emit = defineEmits<{
+  select: [model: AiModel];
+}>();
 
 const selectors = ref<InstanceType<typeof ModelSelector>[]>([]);
 
-function registerRef(el: any, index: number) {
-  if (el) selectors.value[index] = el;
+function registerRef(el: Element | ComponentPublicInstance | null, index: number) {
+  if (!el || el instanceof Element) return;
+  selectors.value[index] = el as InstanceType<typeof ModelSelector>;
 }
 
 function closeAllExcept(index: number) {
@@ -22,18 +29,21 @@ function closeAllExcept(index: number) {
       provider="deepseek"
       label="DeepSeek"
       @open="closeAllExcept(0)"
+      @select="emit('select', $event)"
     />
     <ModelSelector
       :ref="(el) => registerRef(el, 1)"
       provider="claude"
       label="Claude"
       @open="closeAllExcept(1)"
+      @select="emit('select', $event)"
     />
     <ModelSelector
       :ref="(el) => registerRef(el, 2)"
       provider="chatgpt"
       label="ChatGPT"
       @open="closeAllExcept(2)"
+      @select="emit('select', $event)"
     />
   </div>
 </template>

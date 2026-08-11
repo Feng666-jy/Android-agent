@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 dist/
 *.log
 .env.local
@@ -19,6 +19,7 @@ gpt.txt
 # ---- Database files (SQLite), any location ----
 # 严禁提交任何数据库文件 —— Provider 的 API key 明文/密文都可能落在 dev.db
 *.db
+*.db.backup-*
 *.db-journal
 *.db-wal
 *.db-shm

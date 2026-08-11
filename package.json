@@ -12,6 +12,7 @@
 "format": "prettier --write .",
 "build": "vue-tsc --noEmit && vite build",
 "db:init": "tsx scripts/init-db.ts",
+"db:migrate": "tsx scripts/migrate.ts",
 "db:seed": "tsx scripts/seed.ts",
 "dev": "vite",
 "prepare": "husky",

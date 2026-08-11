@@ -162,9 +162,59 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  agentRuns AgentRun[]
+  agentRuns    AgentRun[]
+  agents       Agent[]
+  approvals    Approval[]
+  conversations Conversation[]
 
   @@map("users")
+}
+
+/// Agent（Agent 配置单元 — 借鉴 RikkaHub Assistant；Phase 1 建表，前端管理在 Phase 2）
+model Agent {
+  id            String   @id @default(cuid())
+  userId        Int      @map("user_id")
+  name          String
+  avatar        String?
+  description   String?
+  systemPrompt  String?  @map("system_prompt")
+  modelId       String?  @map("model_id")
+  configJson    String?  @map("config_json")
+  enableMemory  Boolean  @default(false) @map("enable_memory")
+  memoryScope   String   @default("agent") @map("memory_scope") // agent | global
+  mcpServerIds  String?  @map("mcp_server_ids") // JSON array（Phase 2 MCP 绑定）
+  skillIds      String?  @map("skill_ids")       // JSON array（Phase 2 Skill 绑定）
+  toolIds       String?  @map("tool_ids")        // JSON array（Phase 2 工具绑定）
+  workspaceId   String?  @map("workspace_id")
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, enabled])
+  @@map("agents")
+}
+
+/// Approval（审批记录 — Phase 1 T13：ask 工具审批落库，替代纯内存队列）
+model Approval {
+  id            String    @id @default(cuid())
+  runId         String    @map("run_id")
+  userId        Int       @map("user_id")
+  toolName      String    @map("tool_name")
+  argumentsJson String    @default("{}") @map("arguments_json")
+  status        String    @default("pending") // pending|approved|rejected|timeout
+  modelId       String?   @map("model_id")
+  task          String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  settledAt     DateTime? @map("settled_at")
+
+  run  AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([runId, status])
+  @@index([userId, createdAt])
+  @@map("approvals")
 }
 
 /// AgentRun（Agent 运行记录）
@@ -182,6 +232,9 @@ model AgentRun {
   tokenInput    Int      @default(0) @map("token_input")
   tokenOutput   Int      @default(0) @map("token_output")
   tokenTotal    Int      @default(0) @map("token_total")
+  conversationId String?  @map("conversation_id")
+  agentId       String?  @map("agent_id")
+  planJson      String?  @map("plan_json")
   createdAt     DateTime @default(now()) @map("created_at")
   finishedAt    DateTime? @map("finished_at")
 
@@ -189,6 +242,7 @@ model AgentRun {
   messages     AgentMessage[]
   toolCalls    AgentToolCall[]
   tokenEvents  AgentTokenUsage[]
+  steps        AgentStep[]
 
   @@index([userId, createdAt])
   @@map("agent_runs")
@@ -244,3 +298,65 @@ model AgentTokenUsage {
   @@index([runId, createdAt])
   @@map("agent_token_usages")
 }
+
+/// Conversation（会话）— V2.0 持续会话实体，与 AgentRun（执行记录）解耦
+model Conversation {
+  id           String   @id @default(cuid())
+  userId       Int      @map("user_id")
+  agentId      String?  @map("agent_id")
+  title        String   @default("")
+  modelId      String?  @map("model_id")
+  status       String   @default("active") // active | archived
+  pinned       Boolean  @default(false)
+  systemPrompt String?  @map("system_prompt")
+  metadata     String?                           // JSON map（扩展字段）
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@index([userId, updatedAt])
+  @@map("conversations")
+}
+
+/// Message（会话消息）— 聊天消息落库实体，支持附件与分支字段
+model Message {
+  id              String    @id @default(cuid())
+  conversationId  String    @map("conversation_id")
+  runId           String?   @map("run_id")
+  role            String // system|user|assistant|tool
+  content         String?
+  toolCallsJson   String?   @map("tool_calls_json")
+  toolCallId      String?   @map("tool_call_id")
+  attachmentsJson String?   @map("attachments_json") // JSON array（图片/文件引用）
+  tokensJson      String?   @map("tokens_json")      // JSON（token 用量）
+  parentId        String?   @map("parent_id")
+  branchIndex     Int       @default(0) @map("branch_index")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+/// AgentStep（Agent 步骤）— 运行内步骤级持久化（plan/act/observe/reflect/final）
+model AgentStep {
+  id          String   @id @default(cuid())
+  runId       String   @map("run_id")
+  seq         Int
+  kind        String // plan|act|observe|reflect|final
+  status      String   @default("pending") // pending|running|done|failed
+  input       String?
+  output      String?
+  toolCallId  String?  @map("tool_call_id")
+  tokensJson  String?  @map("tokens_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  run         AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, seq])
+  @@map("agent_steps")
+}
+

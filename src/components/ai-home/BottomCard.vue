@@ -2,6 +2,7 @@
 import ChatInput from "./ChatInput.vue"
 import ActionButtons from "./ActionButtons.vue"
 import BottomToolbar from "./BottomToolbar.vue"
+import type { AiModel } from "@/types"
 
 defineProps<{
   mode: "work" | "code"
@@ -11,6 +12,7 @@ const emit = defineEmits<{
   send: [value: string]
   selectAction: [id: string]
   selectTool: [id: string]
+  selectModel: [model: AiModel]
 }>()
 </script>
 
@@ -19,7 +21,7 @@ const emit = defineEmits<{
     <div class="bottom-card__divider" />
     <div class="bottom-card__content">
       <ChatInput @send="emit('send', $event)" />
-      <ActionButtons @select="emit('selectAction', $event)" />
+      <ActionButtons @select="emit('selectModel', $event)" />
       <BottomToolbar
         :mode="mode"
         @select="emit('selectTool', $event)"

@@ -1,9 +1,22 @@
 import "dotenv/config";
-import { prisma, connectDatabase, closeDatabase } from "../server/src/prisma.js";
+import { DatabaseSync } from "node:sqlite";
+import { prisma, connectDatabase, closeDatabase, resolveDbPath } from "../server/src/prisma.js";
+import { applyMigrations } from "../server/src/db/migrate.js";
 
 async function main() {
   // 非破坏性初始化：只确保 schema 存在，绝不删除既有数据。
   // connectDatabase 内部会执行 SCHEMA_SQL（CREATE TABLE IF NOT EXISTS），幂等。
+  // 随后应用增量迁移（prisma/migrations/0002+），保证新表/新列与迁移文件一致。
+  const dbPath = resolveDbPath();
+  const rawDb = new DatabaseSync(dbPath);
+  try {
+    rawDb.exec("PRAGMA foreign_keys = ON;");
+    const migrateResult = applyMigrations(rawDb, { dbPath });
+    for (const name of migrateResult.applied) console.log(`migration applied: ${name}`);
+    if (migrateResult.backupPath) console.log(`database backup: ${migrateResult.backupPath}`);
+  } finally {
+    rawDb.close();
+  }
   const userCount = await prisma.user.count();
   const providerCount = await prisma.provider.count();
   const runCount = await prisma.agentRun.count();

@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   open: [];
+  select: [model: AiModel];
 }>();
 
 const models = ref<AiModel[]>([]);
@@ -56,6 +57,7 @@ async function loadModels() {
 function handleSelect(model: AiModel) {
   selectedModel.value = model;
   visible.value = false;
+  emit("select", model);
 }
 
 function handleClose() {

@@ -7,21 +7,26 @@ const router = Router();
 
 // ---- Provider-specific listing (legacy, used by ModelSelector) ----
 
-const PROVIDER_MODEL_MAP: Record<string, string> = {
-  deepseek: "deepseek",
-  claude: "claude",
-  chatgpt: "chatgpt",
-};
+function normalizeProviderName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
 
 async function getModelsByProvider(provider: string) {
-  const providerId = PROVIDER_MODEL_MAP[provider];
-  if (!providerId) {
+  const normalized = normalizeProviderName(provider);
+  const providers = await prisma.provider.findMany({
+    where: { isEnabled: true },
+    select: { id: true, name: true },
+  });
+  const providerRow = providers.find(
+    (p: any) => normalizeProviderName(p.name) === normalized
+  );
+  if (!providerRow) {
     return [];
   }
 
   const models = await prisma.model.findMany({
     where: {
-      providerId: providerId,
+      providerId: providerRow.id,
       isEnabled: true,
     },
     orderBy: [{ sortOrder: "asc" }, { displayName: "asc" }],

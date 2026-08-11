@@ -1,8 +1,9 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import TopBar from "@/components/ai-home/TopBar.vue";
 import BottomCard from "@/components/ai-home/BottomCard.vue";
 import AgentRunPanel from "@/components/ai-home/AgentRunPanel.vue";
+import AgentRunPanelV2 from "@/components/ai-home/AgentRunPanelV2.vue";
 import { useModelStore } from "@/stores/model";
 import { useConversationStore } from "@/stores/conversation";
 import type { AiModel } from "@/types";
@@ -11,7 +12,8 @@ const currentTab = ref<"work" | "code">("work");
 const modelStore = useModelStore();
 const conversationStore = useConversationStore();
 const runPanel = ref<InstanceType<typeof AgentRunPanel> | null>(null);
-const modelPickerOpen = ref(false);
+const runPanelV2 = ref<InstanceType<typeof AgentRunPanelV2> | null>(null);
+const useV2 = ref(false);
 
 const models = computed(() => modelStore.models as AiModel[]);
 const selectedModel = ref<AiModel | null>(modelStore.defaultModel);
@@ -32,9 +34,8 @@ onMounted(async () => {
   }
 });
 
-function selectModel(m: AiModel) {
+function bindModel(m: AiModel) {
   selectedModel.value = m;
-  modelPickerOpen.value = false;
 }
 
 function handleSend(value: string) {
@@ -42,7 +43,8 @@ function handleSend(value: string) {
     import("vant").then(({ showToast }) => showToast("请先在设置中配置并选择模型"));
     return;
   }
-  runPanel.value?.start(value, String(selectedModel.value.id));
+  const active = useV2.value ? runPanelV2.value : runPanel.value;
+  active?.start(value, String(selectedModel.value.id));
 }
 
 function handleRunDone(payload: { runId: string; task: string; modelId: string }) {
@@ -57,30 +59,9 @@ function handleRunDone(payload: { runId: string; task: string; modelId: string }
       @update:current-tab="currentTab = $event"
     />
     <main class="content">
-      <div class="model-select">
-        <button class="model-select__chip" @click="modelPickerOpen = !modelPickerOpen">
-          <span class="model-select__dot" />
-          <span class="model-select__name">{{ selectedModel?.displayName || selectedModel?.modelName || "选择模型" }}</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
-        <div v-if="modelPickerOpen" class="model-select__menu" @click.self="modelPickerOpen = false">
-          <button
-            v-for="m in models"
-            :key="m.id"
-            class="model-select__item"
-            :class="{ 'model-select__item--active': selectedModel?.id === m.id }"
-            @click="selectModel(m)"
-          >
-            {{ m.displayName || m.modelName }}
-          </button>
-          <p v-if="models.length === 0" class="model-select__empty">暂无模型，请到「设置」中添加</p>
-        </div>
-      </div>
       <AgentRunPanel ref="runPanel" @done="handleRunDone" />
     </main>
-    <BottomCard :mode="currentTab" @send="handleSend" />
+    <BottomCard :mode="currentTab" @send="handleSend" @select-model="bindModel" />
   </div>
 </template>
 
@@ -99,83 +80,32 @@ function handleRunDone(payload: { runId: string; task: string; modelId: string }
   overscroll-behavior: none;
 }
 
+.engine-switch {
+  display: flex;
+  gap: 8px;
+  padding: 4px 2px 10px;
+
+  &__item {
+    font-size: 12px;
+    color: #969799;
+    background: #f2f3f5;
+    border-radius: 999px;
+    padding: 4px 14px;
+    cursor: pointer;
+    user-select: none;
+
+    &--active {
+      color: #fff;
+      background: #1989fa;
+    }
+  }
+}
+
 .content {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   position: relative;
 }
-
-.model-select {
-  position: relative;
-  display: inline-block;
-  margin: 0 0 8px;
-
-  &__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: $ai-radius-full;
-    border: none;
-    background: $ai-card-bg;
-    box-shadow: $ai-shadow-button;
-    cursor: pointer;
-    color: $ai-text-primary;
-    font-family: $ai-font-family;
-    font-size: 13px;
-  }
-
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #07c160;
-  }
-
-  &__menu {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    z-index: 20;
-    min-width: 180px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: $ai-card-bg;
-    border-radius: $ai-radius-small;
-    box-shadow: $ai-shadow-card;
-    padding: 6px;
-  }
-
-  &__item {
-    display: block;
-    width: 100%;
-    padding: 9px 12px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    text-align: left;
-    font-family: $ai-font-family;
-    font-size: 13px;
-    color: $ai-text-primary;
-    cursor: pointer;
-
-    &:hover {
-      background: $ai-input-bg;
-    }
-
-    &--active {
-      background: $ai-input-bg;
-      font-weight: 500;
-    }
-  }
-
-  &__empty {
-    margin: 0;
-    padding: 12px;
-    font-size: 12px;
-    color: $ai-text-placeholder;
-    text-align: center;
-  }
-}
 </style>
+

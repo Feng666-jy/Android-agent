@@ -1,7 +1,10 @@
 /**
- * SQLite schema — 与 prisma/migrations/0001_init/migration.sql 保持一致。
+ * SQLite 基线 schema — 与 prisma/migrations/0001_init/migration.sql 保持一致。
  * 用 node:sqlite 执行，CREATE TABLE IF NOT EXISTS 可对已有库幂等。
  * 注意：providers.authType / providers.healthStatus 是 camelCase 列名（沿用旧迁移）。
+ * ⚠️ 本文件只保留基线表（Phase 0 起）：新表/新列一律通过 prisma/migrations/0002+
+ *    增量迁移 + "npm run db:migrate"（scripts/migrate.ts + server/src/db/migrate.ts）管理，
+ *    避免双 Schema 漂移。
  */
 
 export const SCHEMA_SQL = `
