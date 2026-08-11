@@ -11,8 +11,7 @@ import {
   ModelNotFoundError,
   ModelGroupNotFoundError,
 } from "../services/model.service.js";
-import { success, fail, notFound, serverError } from "../utils/response.js";
-import { logger } from "../utils/logger.js";
+import { success, fail, notFound } from "../utils/response.js";
 
 /**
  * Model Controller — thin controller pattern

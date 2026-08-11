@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { DatabaseSync } from "node:sqlite";
-import { prisma, connectDatabase, closeDatabase, resolveDbPath } from "../server/src/prisma.js";
+import { prisma, closeDatabase, resolveDbPath } from "../server/src/prisma.js";
 import { applyMigrations } from "../server/src/db/migrate.js";
 
 async function main() {

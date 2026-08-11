@@ -141,7 +141,7 @@ export const searchTool: AgentTool = {
       const matches: Array<{ file: string; lines: number[] }> = [];
       const needle = query.toLowerCase();
 
-      async function walk(dir: string): Promise<void> {
+      const walk = async (dir: string): Promise<void> => {
         if (matches.length >= maxResults) return;
         let entries;
         try {

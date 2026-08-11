@@ -248,7 +248,6 @@ describe("LLM protocol handlers �?stream parsing", () => {
   });
 
   it("anthropic: accumulates tool input_json fragments", async () => {
-    const h = new AnthropicHandler();
     const body = [
       'data: {"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"tu1","name":"read_file","input":{}}}',
       'data: {"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{\\"path\\":"}}',
@@ -269,7 +268,6 @@ describe("LLM protocol handlers �?stream parsing", () => {
   });
 
   it("ollama: NDJSON lines with done flag", async () => {
-    const h = new OllamaHandler();
     const body = ['{"message":{"content":"hi"}}', '{"message":{"content":"!"},"done":true,"eval_count":2,"prompt_eval_count":1}'].join("\n");
     const res = new Response(body, { status: 200 });
     const h2 = new OllamaHandler(async () => res as unknown as Response);
@@ -289,3 +287,4 @@ describe("LLM base utilities", () => {
     assert.ok(estimateTokens("你好世界") >= 1);
   });
 });
+

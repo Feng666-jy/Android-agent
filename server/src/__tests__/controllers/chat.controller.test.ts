@@ -2,7 +2,7 @@ import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { mock } from "node:test";
 
-import { chatController, handleNonStream, handleStream, chatCompletionsSchema } from "../../controllers/chat.controller.ts";
+import { handleNonStream, handleStream, chatCompletionsSchema } from "../../controllers/chat.controller.ts";
 import { llmService } from "../../services/llm/index.ts";
 import { LlmAuthError, LlmUnreachableError, LlmValidationError } from "../../services/llm/index.ts";
 import { createMockRes, createMockReq, createMockNext } from "../helpers.ts";
@@ -135,7 +135,7 @@ describe("chatController.completions", () => {
     });
 
     const writes: string[] = [];
-    let headers: Record<string, string> = {};
+    const headers: Record<string, string> = {};
     const res = {
       setHeader: (k: string, v: string) => { headers[k] = v; },
       write: (chunk: string) => { writes.push(chunk); },
@@ -166,3 +166,4 @@ describe("chatController.completions", () => {
     assert.ok((res as any).end.mock.calls.length >= 1);
   });
 });
+

@@ -1,7 +1,6 @@
 ﻿import type { Request, Response, NextFunction } from "express";
 import { providerService, ProviderValidationError, ProviderNotFoundError, ProviderOperationError } from "../services/provider.service.js";
-import { success, fail, notFound, serverError } from "../utils/response.js";
-import { logger } from "../utils/logger.js";
+import { success, fail, notFound } from "../utils/response.js";
 
 /**
  * Provider Controller — 薄控制器模式

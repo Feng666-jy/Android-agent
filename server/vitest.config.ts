@@ -1,6 +1,7 @@
 ﻿import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
 import type { Plugin } from 'vite'
+import { existsSync } from 'node:fs'
 
 // Resolver that maps explicit .js imports to .ts source files (ESM convention)
 function tsJsResolver(): Plugin {
@@ -19,8 +20,7 @@ function tsJsResolver(): Plugin {
         ]
         for (const attempt of attempts) {
           try {
-            const fs = require('fs') as typeof import('fs')
-            if (fs.existsSync(attempt)) {
+            if (existsSync(attempt)) {
               return attempt
             }
           } catch {
