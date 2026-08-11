@@ -41,7 +41,7 @@ cp .env .env.local
 npx prisma db push
 
 # Start development
-npm run dev      # Frontend (port 5173)
+npm run dev:all      # Frontend (port 5173)
 npm run server   # Backend (port 3000)
 ```
 
