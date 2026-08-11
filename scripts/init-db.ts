@@ -1,23 +1,15 @@
 import "dotenv/config";
-import { rmSync } from "node:fs";
-import path from "node:path";
-import { prisma, connectDatabase, closeDatabase, resolveDbPath } from "../server/src/prisma.js";
+import { prisma, connectDatabase, closeDatabase } from "../server/src/prisma.js";
 
 async function main() {
-  // 删除旧库（若存在）后重建空库
-  const dbPath = resolveDbPath();
-  rmSync(dbPath, { force: true });
-  await connectDatabase();
-
-  // 写入测试
-  const user = await prisma.user.create({
-    data: { username: "testuser", password: "123456", email: "test@test.com" },
-  });
-  console.log("User created successfully:", user.id, user.username);
-
-  // 清理测试数据
-  await prisma.user.delete({ where: { id: user.id } });
-  console.log("Test passed, data cleaned up");
+  // 非破坏性初始化：只确保 schema 存在，绝不删除既有数据。
+  // connectDatabase 内部会执行 SCHEMA_SQL（CREATE TABLE IF NOT EXISTS），幂等。
+  const userCount = await prisma.user.count();
+  const providerCount = await prisma.provider.count();
+  const runCount = await prisma.agentRun.count();
+  console.log(
+    `Database ready (users=${userCount}, providers=${providerCount}, runs=${runCount}) — schema ensured, data preserved`
+  );
 }
 
 async function run() {
