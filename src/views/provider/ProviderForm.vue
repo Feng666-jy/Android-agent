@@ -35,6 +35,8 @@ const form = reactive({
   isEnabled: true,
 });
 
+const hasStoredKey = ref(false);
+
 const saving = ref(false);
 const loading = ref(false);
 const formRef = ref(null);
@@ -51,6 +53,7 @@ onMounted(async () => {
       form.protocol = data.protocol;
       form.authType = data.authType;
       form.isEnabled = data.isEnabled;
+      hasStoredKey.value = !!data.hasApiKey;
     }
     loading.value = false;
   }
@@ -155,7 +158,8 @@ function onAuthConfirm({ selectedValues }: PickerConfirmEventParams) {
           />
           <van-field
             v-model="form.apiKeyEncrypted" name="apiKey" label="API Key"
-            placeholder="留空表示不修改（编辑模式）" type="password" autocomplete="off"
+            :placeholder="hasStoredKey ? '已保存，留空表示不修改' : '输入 API Key'"
+            type="password" autocomplete="off"
           />
           <van-field name="isEnabled" label="启用">
             <template #input>

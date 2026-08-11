@@ -13,6 +13,7 @@ import { mock } from "node:test";
 
 // 在 import 之前设置环境变量
 process.env.DATABASE_URL = "file:./test.db";
+process.env.JWT_SECRET = "test-jwt-secret";
 
 async function loadMocksAndService() {
   const { prisma } = await import("../../prisma.ts");
@@ -98,6 +99,32 @@ describe("provider.service", () => {
         }
       );
     });
+
+    it("encrypts apiKeyEncrypted before storing and does not leak it", async () => {
+      const { prisma, svc } = await loadMocksAndService();
+      let persisted: any = null;
+      const createMock = mock.fn(async (args: any) => {
+        persisted = args.data;
+        return { id: "prov_enc", name: args.data.name, ...args.data };
+      });
+      const aggregateMock = mock.fn(async () => ({ _max: { sortOrder: -1 } }));
+      prisma.provider = { create: createMock, aggregate: aggregateMock } as any;
+
+      const apiKey = "sk-secret-real-key-1234567890";
+      const result = await svc.providerService.createProvider({
+        name: "Encrypted",
+        baseUrl: "https://api.example.com/v1",
+        authType: "API_KEY",
+        apiKeyEncrypted: apiKey,
+      });
+
+      // 入库值已加密（enc:v1: 前缀）且不含明文
+      assert.equal((persisted.apiKeyEncrypted as string).startsWith("enc:v1:"), true);
+      assert.equal((persisted.apiKeyEncrypted as string).includes(apiKey), false);
+      // 返回值不暴露密钥，仅暴露 hasApiKey
+      assert.equal(result.apiKeyEncrypted, undefined);
+      assert.equal(result.hasApiKey, true);
+    });
   });
 
   describe("getProviders", () => {
@@ -146,6 +173,22 @@ describe("provider.service", () => {
       } as any;
 
       await svc.providerService.getProviders(true);
+    });
+
+    it("strips apiKeyEncrypted and exposes hasApiKey", async () => {
+      const { prisma, svc } = await loadMocksAndService();
+      prisma.provider = {
+        findMany: mock.fn(async () => [
+          { id: "p1", name: "A", isEnabled: true, apiKeyEncrypted: "should-not-leak" },
+          { id: "p2", name: "B", isEnabled: true, apiKeyEncrypted: null },
+        ]),
+      } as any;
+
+      const result = await svc.providerService.getProviders();
+      assert.equal(result[0].apiKeyEncrypted, undefined);
+      assert.equal(result[0].hasApiKey, true);
+      assert.equal(result[1].apiKeyEncrypted, undefined);
+      assert.equal(result[1].hasApiKey, false);
     });
   });
 

@@ -32,6 +32,7 @@ export interface Provider {
   lastCheckedAt: string | null;
   sortOrder: number;
   isBuiltin: boolean;
+  hasApiKey: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: { models: number };

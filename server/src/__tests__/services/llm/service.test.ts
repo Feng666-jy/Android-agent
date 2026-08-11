@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mock } from "node:test";
 
 process.env.DATABASE_URL = "file:./test-llm.db";
+process.env.JWT_SECRET = "test-jwt-secret";
 
 async function load() {
   const { prisma } = await import("../../../prisma.ts");
@@ -100,6 +101,42 @@ describe("llm.service", () => {
 
       const target = await llm.llmService.resolveTarget({ providerId: "p2", modelName: "claude-3-5-sonnet-20241022" });
       assert.equal(target.handler.protocol, "ANTHROPIC");
+    });
+
+    it("decrypts encrypted apiKeyEncrypted in resolveTarget", async () => {
+      const { prisma, llm } = await load();
+      const { encryptSecret } = await import("../../../utils/crypto.ts");
+      const apiKey = "sk-enc-at-rest-very-secret-999888777666555";
+      prisma.model = {
+        findUnique: mock.fn(async () => ({
+          id: "m1",
+          providerId: "p1",
+          modelName: "gpt-4o",
+          temperature: 0.7,
+          maxOutputTokens: 4096,
+          topP: null,
+          frequencyPenalty: null,
+          presencePenalty: null,
+          contextWindow: 128000,
+          customHeaders: null,
+          customParams: null,
+        })),
+      } as any;
+      prisma.provider = {
+        findUnique: mock.fn(async () => ({
+          id: "p1",
+          name: "Encrypted",
+          baseUrl: "https://api.openai.com/v1",
+          protocol: "OPENAI_COMPATIBLE",
+          authType: "API_KEY",
+          apiKeyEncrypted: encryptSecret(apiKey),
+          isEnabled: true,
+          metadata: null,
+        })),
+      } as any;
+
+      const target = await llm.llmService.resolveTarget({ modelId: "m1" });
+      assert.equal(target.provider.apiKey, apiKey);
     });
 
     it("parses metadata customHeaders and customParams", async () => {

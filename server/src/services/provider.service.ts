@@ -1,5 +1,6 @@
 ﻿import { prisma } from "../prisma.js";
 import { logger } from "../utils/logger.js";
+import { ensureEncrypted, decryptSecret } from "../utils/crypto.js";
 
 /**
  * Provider Service — 深度模块
@@ -55,6 +56,32 @@ export interface ImportResult {
   created: number;
   skipped: number;
   models: any[];
+}
+
+/** 返回给前端的 Provider 视图（剥离 apiKeyEncrypted，暴露 hasApiKey） */
+export interface ProviderView {
+  id: string;
+  name: string;
+  baseUrl: string;
+  protocol: string;
+  authType: string;
+  isEnabled: boolean;
+  healthStatus: string;
+  lastCheckedAt: string | null;
+  sortOrder: number;
+  isBuiltin: boolean;
+  metadata: string | null;
+  createdAt: string;
+  updatedAt: string;
+  hasApiKey: boolean;
+  models?: any[];
+  _count?: { models: number };
+}
+
+function toProviderView(row: any): ProviderView {
+  if (!row) return row;
+  const { apiKeyEncrypted, ...rest } = row;
+  return { ...rest, hasApiKey: Boolean(apiKeyEncrypted) };
 }
 
 // ---- 验证函数 ----
@@ -148,7 +175,7 @@ export const providerService = {
         baseUrl: input.baseUrl.trim(),
         protocol: input.protocol ?? "OPENAI_COMPATIBLE",
         authType: input.authType ?? "API_KEY",
-        apiKeyEncrypted: input.apiKeyEncrypted,
+        apiKeyEncrypted: ensureEncrypted(input.apiKeyEncrypted),
         metadata: input.metadata ? JSON.stringify(input.metadata) : null,
         sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
         healthStatus: "UNKNOWN",
@@ -157,27 +184,27 @@ export const providerService = {
     });
 
     logger.info(`Provider created: ${provider.name} (${provider.id})`);
-    return provider;
+    return toProviderView(provider);
   },
 
   /**
    * 获取 Provider 列表
    * 默认只返回 enabled，按 sortOrder 排序
    */
-  async getProviders(includeDisabled = false): Promise<any[]> {
+  async getProviders(includeDisabled = false): Promise<ProviderView[]> {
     const providers = await prisma.provider.findMany({
       where: includeDisabled ? {} : { isEnabled: true },
       orderBy: { sortOrder: "asc" },
       include: { _count: { select: { models: true } } },
     });
 
-    return providers;
+    return providers.map(toProviderView);
   },
 
   /**
    * 获取单个 Provider
    */
-  async getProvider(id: string): Promise<any> {
+  async getProvider(id: string): Promise<ProviderView> {
     const provider = await prisma.provider.findUnique({
       where: { id },
       include: { models: { where: { isEnabled: true } } },
@@ -187,7 +214,7 @@ export const providerService = {
       throw new ProviderNotFoundError(id);
     }
 
-    return provider;
+    return toProviderView(provider);
   },
 
   /**
@@ -215,7 +242,7 @@ export const providerService = {
         ...(input.baseUrl !== undefined && { baseUrl: input.baseUrl.trim() }),
         ...(input.protocol !== undefined && { protocol: input.protocol }),
         ...(input.authType !== undefined && { authType: input.authType }),
-        ...(input.apiKeyEncrypted !== undefined && { apiKeyEncrypted: input.apiKeyEncrypted }),
+        ...(input.apiKeyEncrypted !== undefined && { apiKeyEncrypted: ensureEncrypted(input.apiKeyEncrypted) }),
         ...(input.isEnabled !== undefined && { isEnabled: input.isEnabled }),
         ...(input.healthStatus !== undefined && { healthStatus: input.healthStatus }),
         ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
@@ -224,7 +251,7 @@ export const providerService = {
     });
 
     logger.info(`Provider updated: ${provider.name} (${provider.id})`);
-    return provider;
+    return toProviderView(provider);
   },
 
   /**
@@ -263,7 +290,7 @@ export const providerService = {
       const healthUrl = `${provider.baseUrl.replace(/\/$/, "")}/models`;
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (provider.authType === "API_KEY" && provider.apiKeyEncrypted) {
-        headers.Authorization = `Bearer ${provider.apiKeyEncrypted}`;
+        headers.Authorization = `Bearer ${decryptSecret(provider.apiKeyEncrypted)}`;
       }
       const response = await fetch(healthUrl, {
         method: "GET",
@@ -367,9 +394,9 @@ export const providerService = {
     // 认证：GET 端点不支持自定义 headers，按协议拼接
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (protocol === "GOOGLE_GEMINI" && provider.apiKeyEncrypted) {
-      url += `${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(provider.apiKeyEncrypted)}`;
+      url += `${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(decryptSecret(provider.apiKeyEncrypted))}`;
     } else if (provider.authType === "API_KEY" && provider.apiKeyEncrypted) {
-      headers.Authorization = `Bearer ${provider.apiKeyEncrypted}`;
+      headers.Authorization = `Bearer ${decryptSecret(provider.apiKeyEncrypted)}`;
     }
 
     try {

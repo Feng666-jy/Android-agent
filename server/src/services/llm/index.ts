@@ -12,6 +12,7 @@
 
 import { prisma } from "../../prisma.js";
 import { logger } from "../../utils/logger.js";
+import { decryptSecret } from "../../utils/crypto.js";
 import { BaseHandler, parseJsonField } from "./base.js";
 import { LlmValidationError } from "./errors.js";
 import { getHandler } from "./factory.js";
@@ -81,7 +82,7 @@ async function resolveTarget(input: Pick<ChatCompletionsInput, "modelId" | "prov
     providerId: providerRow.id,
     baseUrl: providerRow.baseUrl,
     protocol: providerRow.protocol,
-    apiKey: providerRow.apiKeyEncrypted ?? undefined,
+    apiKey: providerRow.apiKeyEncrypted ? decryptSecret(providerRow.apiKeyEncrypted) : undefined,
     authType: providerRow.authType,
     customHeaders: providerMeta.customHeaders as Record<string, string> | undefined,
     timeoutMs: typeof providerMeta.timeoutMs === "number" ? providerMeta.timeoutMs : undefined,
