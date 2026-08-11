@@ -87,6 +87,9 @@ docker compose up -d
 | GET | /api/user/info | Yes | Get user info |
 | PUT | /api/user/profile | Yes | Update profile |
 
+添加模型从上游获取
+<img width="500" height="803" alt="image" src="https://github.com/user-attachments/assets/6dc4bb08-8b82-494c-a88c-628f18e08f42" />
+
 ## License
 
 MIT
