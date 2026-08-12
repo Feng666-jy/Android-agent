@@ -118,6 +118,11 @@ async function loadAll() {
 
 onMounted(loadAll)
 
+function changePeriod(key: 'month' | 'last' | 'all') {
+  usagePeriod.value = key
+  reloadUsage()
+}
+
 async function reloadUsage() {
   try {
     const res = await billingAPI.usage(usageParams.value)
@@ -314,10 +319,7 @@ const invoiceStatusLabels: Record<string, string> = {
             :key="opt.key"
             class="billing-view__seg-btn"
             :class="{ 'is-active': usagePeriod === opt.key }"
-            @click="
-              usagePeriod = opt.key
-              reloadUsage()
-            "
+            @click="changePeriod(opt.key)"
           >
             {{ opt.label }}
           </button>
