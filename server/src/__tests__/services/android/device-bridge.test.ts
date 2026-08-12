@@ -13,7 +13,7 @@ import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import path from 'node:path'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 
 let server: any
 let bridge: any

@@ -13,7 +13,7 @@ import { recordUsage, getUsageSummary } from '../../../services/ai-resource/usag
 import { estimateCost, resolveModelPricing } from '../../../services/ai-resource/cost.ts'
 import { getModelCatalog, getResourceSummary } from '../../../services/ai-resource/catalog.ts'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 let tempRoot: string
 let userId: number
 

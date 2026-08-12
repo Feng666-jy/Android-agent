@@ -14,7 +14,7 @@ import { closeDatabase, prisma } from '../../../prisma.ts'
 import { ToolRouter } from '../../../services/agent-v2/tool-router.ts'
 import { deviceRegistry } from '../../../services/android/device-registry.ts'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 let tempRoot: string
 let userId: number
 

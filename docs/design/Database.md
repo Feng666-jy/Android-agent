@@ -1,4 +1,7 @@
-﻿# Database.md — AI Model Management System 数据库设计
+> ⚠️ **现状标注（2026-08）**：本文档为早期 Android 原生（Room/Kotlin）设计档案，**不代表当前实现**。
+> 当前数据库架构为 **SQLite + Custom Migration Runner + Typed Query Compatibility Layer**
+> （详见 `server/src/db/SUPPORTED.md` 与 `docs/architecture-decisions.md` ADR-001）。
+# Database.md — AI Model Management System 数据库设计
 
 > 基于 Architecture.md 的规范，定义具体的数据库表结构。
 > 使用 Room (SQLite) 作为 ORM 引擎。

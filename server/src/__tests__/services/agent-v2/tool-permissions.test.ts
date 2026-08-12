@@ -20,7 +20,7 @@ import {
   type ArgumentRule
 } from '../../../services/agent-v2/tool-permissions.ts'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 let tempRoot: string
 let userId: number
 let agentId: string

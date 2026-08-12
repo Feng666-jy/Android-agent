@@ -11,7 +11,7 @@ import { applyMigrations } from '../../../db/migrate.ts'
 import { closeDatabase, prisma } from '../../../prisma.ts'
 import { ToolRouter, ensureBuiltinToolRows } from '../../../services/agent-v2/tool-router.ts'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 let tempRoot: string
 let userId: number
 

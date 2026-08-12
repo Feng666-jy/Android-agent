@@ -22,7 +22,7 @@ Android Agent 是一个面向移动端的 AI Agent 平台。
 
 - 前端基于 **Vue3 + TypeScript**
 - 后端基于 **Node.js + Express**
-- 数据层使用 **Prisma ORM**
+- 数据层使用 **SQLite + Custom Migration Runner + Typed Query Compatibility Layer**
 - 支持接入不同 LLM 模型
 - 支持模型管理、用户系统、任务执行等能力
 
@@ -108,7 +108,7 @@ Gemini
 
                      │
 
-          Prisma ORM + Database
+          SQLite + Query Compatibility Layer
 
                      │
 
@@ -144,8 +144,8 @@ Gemini
 | Node.js | 服务运行环境 |
 | Express | API 服务 |
 | TypeScript | 类型系统 |
-| Prisma | ORM |
-| MySQL | 数据库 |
+| SQLite | 数据库 |
+| SQLite | 数据库 |
 | JWT | 用户认证 |
 | Zod | 数据校验 |
 
@@ -202,7 +202,9 @@ API_KEY=
 
 
 ```bash
-npx prisma db push
+npm run db:init     # 初始化 schema + 应用全部迁移（自动备份，幂等）
+npm run db:migrate  # 仅应用未执行的增量迁移
+npm run db:inspect  # 查看表 / 列 / 索引 / 迁移状态
 ```
 
 
@@ -289,8 +291,12 @@ Android-Agent
 │       ├── types/        # 类型
 │       └── utils/        # 工具
 │
-├── prisma/
-│       └── schema.prisma
+├── server/src/db/
+│       ├── schema.ts        # SQLite 基线 DDL
+│       ├── migrations/      # 增量迁移（0001_init ~ 0008_ai_resource）
+│       ├── query.ts         # Prisma 风格查询构建器（兼容层）
+│       ├── fieldmaps.ts     # 表/字段映射
+│       └── migrate.ts       # 幂等迁移运行器
 │
 └── docker/
         └── docker-compose.yml

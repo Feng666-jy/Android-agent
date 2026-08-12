@@ -1,4 +1,7 @@
-﻿# Architecture.md — AI Model Management System 架构设计
+> ⚠️ **现状标注（2026-08）**：本文档为早期 Android 原生（Kotlin/Room）设计档案，**不代表当前实现**。
+> 当前实现为 Web 前后端（Vue3 + Express + SQLite），数据库层见 `server/src/db/SUPPORTED.md`
+> 与 `docs/architecture-decisions.md` ADR-001。
+# Architecture.md — AI Model Management System 架构设计
 
 > 本文档是 AI Model Management System 的最高设计权威。
 > 所有模块设计、数据库设计、接口设计必须以本文档为准。

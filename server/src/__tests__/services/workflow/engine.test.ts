@@ -18,7 +18,7 @@ import {
 } from '../../../services/workflow/registry.ts'
 import type { WorkflowDef } from '../../../services/workflow/types.ts'
 
-const MIGRATIONS_DIR = path.resolve(process.cwd(), 'prisma/migrations')
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'server/src/db/migrations')
 let tempRoot: string
 let userId: number
 
