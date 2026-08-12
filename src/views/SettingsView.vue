@@ -1,14 +1,18 @@
 ﻿<script setup lang="ts">
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 function goProviders() {
-  router.push("/workspace/settings/providers");
+  router.push('/workspace/settings/providers')
 }
 
 function goModels() {
-  router.push("/workspace/settings/models");
+  router.push('/workspace/settings/models')
+}
+
+function goTools() {
+  router.push('/workspace/settings/tools')
 }
 </script>
 
@@ -21,13 +25,46 @@ function goModels() {
       <div class="settings__group">
         <div class="settings__item" @click="goProviders">
           <span class="settings__item-label">供应商管理</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
         <div class="settings__item" @click="goModels">
           <span class="settings__item-label">模型管理</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <div class="settings__item" @click="goTools">
+          <span class="settings__item-label">工具管理</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
@@ -38,7 +75,7 @@ function goModels() {
 </template>
 
 <style scoped lang="scss">
-@use "@/styles/ai-tokens" as *;
+@use '@/styles/ai-tokens' as *;
 
 .settings {
   width: 100%;

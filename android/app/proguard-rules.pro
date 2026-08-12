@@ -1,0 +1,2 @@
+-keep class com.getcapacitor.** { *; }
+-keep class com.androidagent.app.plugins.** { *; }

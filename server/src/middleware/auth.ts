@@ -14,6 +14,11 @@ declare global {
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set')
 
+/** 校验 token 并返回 payload（WSS 设备连接等非 HTTP 场景复用） */
+export function verifyToken(token: string): JwtPayload {
+  return jwt.verify(token, JWT_SECRET!) as JwtPayload
+}
+
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,8 +28,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   const token = authHeader.split(' ')[1]
   try {
-    const decoded = jwt.verify(token, JWT_SECRET!) as JwtPayload
-    req.user = decoded
+    req.user = verifyToken(token)
     next()
   } catch {
     unauthorized(res, 'Invalid or expired token')

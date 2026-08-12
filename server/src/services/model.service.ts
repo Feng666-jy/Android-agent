@@ -1,45 +1,45 @@
-﻿import type { PrismaClient } from "../prisma.js";
+﻿import type { PrismaClient } from '../prisma.js'
 
 // ---- Types ----
 
 export interface GetModelsParams {
-  search?: string;
-  providerId?: string;
-  groupId?: string | null;
-  isFavorite?: boolean;
-  capability?: string;
-  sort?: "name" | "created" | "usage" | "favorite";
-  page?: number;
-  pageSize?: number;
+  search?: string
+  providerId?: string
+  groupId?: string | null
+  isFavorite?: boolean
+  capability?: string
+  sort?: 'name' | 'created' | 'usage' | 'favorite'
+  page?: number
+  pageSize?: number
 }
 
 export interface GetModelsResult {
-  models: any[];
-  total: number;
-  page: number;
-  pageSize: number;
+  models: any[]
+  total: number
+  page: number
+  pageSize: number
 }
 
 export interface CreateGroupInput {
-  name: string;
-  description?: string;
-  icon?: string;
-  color?: string;
+  name: string
+  description?: string
+  icon?: string
+  color?: string
 }
 
 // ---- Errors ----
 
 class ModelNotFoundError extends Error {
   constructor(id: string) {
-    super(`Model not found: ${id}`);
-    this.name = "ModelNotFoundError";
+    super(`Model not found: ${id}`)
+    this.name = 'ModelNotFoundError'
   }
 }
 
 class ModelGroupNotFoundError extends Error {
   constructor(id: string) {
-    super(`Model group not found: ${id}`);
-    this.name = "ModelGroupNotFoundError";
+    super(`Model group not found: ${id}`)
+    this.name = 'ModelGroupNotFoundError'
   }
 }
 
@@ -48,53 +48,56 @@ class ModelGroupNotFoundError extends Error {
 /**
  * Get model list with search + filter + sort + pagination.
  */
-export async function getModels(prisma: PrismaClient, params: GetModelsParams): Promise<GetModelsResult> {
+export async function getModels(
+  prisma: PrismaClient,
+  params: GetModelsParams
+): Promise<GetModelsResult> {
   const {
     search,
     providerId,
     groupId,
     isFavorite,
-    sort = "default",
+    sort = 'default',
     page = 1,
-    pageSize = 20,
-  } = params;
+    pageSize = 20
+  } = params
 
-  const where: Record<string, any> = { isEnabled: true };
+  const where: Record<string, any> = { isEnabled: true }
 
   if (search?.trim()) {
     where.OR = [
       { displayName: { contains: search.trim() } },
       { modelName: { contains: search.trim() } },
-      { aliases: { contains: search.trim() } },
-    ];
+      { aliases: { contains: search.trim() } }
+    ]
   }
 
   if (providerId) {
-    where.providerId = providerId;
+    where.providerId = providerId
   }
 
   if (groupId !== undefined) {
-    where.groupId = groupId;
+    where.groupId = groupId
   }
 
   if (isFavorite !== undefined) {
-    where.isFavorite = isFavorite;
+    where.isFavorite = isFavorite
   }
 
-  let orderBy: Record<string, string>[] = [{ sortOrder: "asc" }];
+  let orderBy: Record<string, any>[] = [{ sortOrder: 'asc' }]
   switch (sort) {
-    case "name":
-      orderBy = [{ displayName: "asc" }];
-      break;
-    case "created":
-      orderBy = [{ createdAt: "desc" }];
-      break;
-    case "favorite":
-      orderBy = [{ isFavorite: "desc" }, { sortOrder: "asc" }];
-      break;
-    case "usage":
-      orderBy = [{ usageStats: { lastUsedAt: "desc" } }];
-      break;
+    case 'name':
+      orderBy = [{ displayName: 'asc' }]
+      break
+    case 'created':
+      orderBy = [{ createdAt: 'desc' }]
+      break
+    case 'favorite':
+      orderBy = [{ isFavorite: 'desc' }, { sortOrder: 'asc' }]
+      break
+    case 'usage':
+      orderBy = [{ usageStats: { lastUsedAt: 'desc' } }]
+      break
   }
 
   const [models, total] = await Promise.all([
@@ -103,48 +106,48 @@ export async function getModels(prisma: PrismaClient, params: GetModelsParams): 
       orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { group: true, usageStats: true },
+      include: { group: true, usageStats: true }
     }),
-    (prisma.model as any).count({ where }),
-  ]);
+    (prisma.model as any).count({ where })
+  ])
 
-  return { models, total, page, pageSize };
+  return { models, total, page, pageSize }
 }
 
 /**
  * Toggle a model's favorite status.
  */
 export async function toggleFavorite(prisma: PrismaClient, id: string): Promise<any> {
-  const existing = await (prisma.model as any).findUnique({ where: { id } });
+  const existing = await (prisma.model as any).findUnique({ where: { id } })
   if (!existing) {
-    throw new ModelNotFoundError(id);
+    throw new ModelNotFoundError(id)
   }
 
   return (prisma.model as any).update({
     where: { id },
-    data: { isFavorite: !existing.isFavorite },
-  });
+    data: { isFavorite: !existing.isFavorite }
+  })
 }
 
 /**
  * Set a model as the default, clearing any previous default.
  */
 export async function setDefault(prisma: PrismaClient, id: string): Promise<any> {
-  const existing = await (prisma.model as any).findUnique({ where: { id } });
+  const existing = await (prisma.model as any).findUnique({ where: { id } })
   if (!existing) {
-    throw new ModelNotFoundError(id);
+    throw new ModelNotFoundError(id)
   }
 
-  return(prisma as any).$transaction(async (tx: any) => {
+  return (prisma as any).$transaction(async (tx: any) => {
     await tx.model.updateMany({
       where: { isDefault: true, id: { not: id } },
-      data: { isDefault: false },
-    });
+      data: { isDefault: false }
+    })
     return tx.model.update({
       where: { id },
-      data: { isDefault: true },
-    });
-  });
+      data: { isDefault: true }
+    })
+  })
 }
 
 /**
@@ -152,9 +155,9 @@ export async function setDefault(prisma: PrismaClient, id: string): Promise<any>
  */
 export async function getGroups(prisma: PrismaClient): Promise<any[]> {
   return (prisma.modelGroup as any).findMany({
-    orderBy: [{ isPinned: "desc" }, { sortOrder: "asc" }],
-    include: { _count: { select: { models: true } } },
-  });
+    orderBy: [{ isPinned: 'desc' }, { sortOrder: 'asc' }],
+    include: { _count: { select: { models: true } } }
+  })
 }
 
 /**
@@ -162,8 +165,8 @@ export async function getGroups(prisma: PrismaClient): Promise<any[]> {
  */
 export async function createGroup(prisma: PrismaClient, input: CreateGroupInput): Promise<any> {
   const maxOrder = await (prisma.modelGroup as any).aggregate({
-    _max: { sortOrder: true },
-  });
+    _max: { sortOrder: true }
+  })
 
   return (prisma.modelGroup as any).create({
     data: {
@@ -171,26 +174,26 @@ export async function createGroup(prisma: PrismaClient, input: CreateGroupInput)
       description: input.description,
       icon: input.icon,
       color: input.color,
-      sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
-    },
-  });
+      sortOrder: (maxOrder._max.sortOrder ?? -1) + 1
+    }
+  })
 }
 
 /**
  * Delete a group and detach its models.
  */
 export async function deleteGroup(prisma: PrismaClient, id: string): Promise<void> {
-  const existing = await (prisma.modelGroup as any).findUnique({ where: { id } });
+  const existing = await (prisma.modelGroup as any).findUnique({ where: { id } })
   if (!existing) {
-    throw new ModelGroupNotFoundError(id);
+    throw new ModelGroupNotFoundError(id)
   }
 
   await (prisma.model as any).updateMany({
     where: { groupId: id },
-    data: { groupId: null },
-  });
+    data: { groupId: null }
+  })
 
-  await (prisma.modelGroup as any).delete({ where: { id } });
+  await (prisma.modelGroup as any).delete({ where: { id } })
 }
 
 /**
@@ -203,10 +206,10 @@ export async function moveModelsToGroup(
 ): Promise<{ updated: number }> {
   const result = await (prisma.model as any).updateMany({
     where: { id: { in: modelIds } },
-    data: { groupId },
-  });
+    data: { groupId }
+  })
 
-  return { updated: result.count };
+  return { updated: result.count }
 }
 
-export { ModelNotFoundError, ModelGroupNotFoundError };
+export { ModelNotFoundError, ModelGroupNotFoundError }

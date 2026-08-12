@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Android Agent</string>
+    <string name="accessibility_service_name">Android Agent 无障碍</string>
+    <string name="accessibility_service_description">用于读取屏幕 UI 树并执行点击、输入、滑动等自动化操作（Agent 执行任务必需）。</string>
+</resources>

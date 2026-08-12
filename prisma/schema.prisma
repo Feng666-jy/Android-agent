@@ -360,3 +360,92 @@ model AgentStep {
   @@map("agent_steps")
 }
 
+/// Tool（动态工具注册表 — Phase 2 T14：内置工具登记 + 用户自定义 + MCP/Skill 工具）
+model Tool {
+  id             String   @id @default(cuid())
+  userId         Int?     @map("user_id")
+  name           String   @unique
+  description    String   @default("")
+  parametersJson String   @default("{}") @map("parameters_json") // JSON Schema
+  source         String   @default("builtin") // builtin | custom | mcp | skill
+  enabled        Boolean  @default(true)
+  configJson     String?  @map("config_json") // JSON（MCP/Skill 绑定等）
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([enabled])
+  @@index([userId])
+  @@map("tools")
+}
+
+/// ToolPermission（工具权限策略 — Phase 2 T16：global / user / agent 三级作用域 + 参数规则）
+model ToolPermission {
+  id                String   @id @default(cuid())
+  scope             String   @default("user") // global | user | agent
+  userId            Int?     @map("user_id")
+  agentId           String?  @map("agent_id")
+  toolName          String   @map("tool_name")
+  permission        String   @default("allow") // allow | ask | deny
+  argumentRulesJson String?  @map("argument_rules_json") // JSON array（参数级审批规则）
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([toolName])
+  @@map("tool_permissions")
+}
+
+/// McpServer（MCP 服务器配置 — Phase 2 T17）
+model McpServer {
+  id          String   @id @default(cuid())
+  userId      Int      @map("user_id")
+  name        String
+  transport   String   @default("sse") // sse | streamable-http
+  url         String
+  headersJson String   @default("{}") @map("headers_json")
+  enabled     Boolean  @default(true)
+  status      String   @default("disconnected") // disconnected | connecting | connected | error
+  error       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, enabled])
+  @@map("mcp_servers")
+}
+
+/// Skill（Skill 包 — Phase 2 T19：加载器 + read_skill 工具）
+model Skill {
+  id          String   @id @default(cuid())
+  userId      Int?     @map("user_id")
+  name        String
+  description String   @default("")
+  content     String   @default("")
+  version     String   @default("1.0.0")
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, enabled])
+  @@map("skills")
+}
+
+/// Device（端侧设备注册表 — Phase 3 T22：Device Bridge 持久化侧）
+model Device {
+  id              String   @id @default(cuid())
+  userId          Int      @map("user_id")
+  deviceId        String   @map("device_id")
+  name            String   @default("")
+  platform        String   @default("android")
+  model           String?
+  osVersion       String?  @map("os_version")
+  appVersion      String?  @map("app_version")
+  capabilitiesJson String  @default("{}") @map("capabilities_json") // JSON map
+  status          String   @default("offline") // online | offline
+  lastSeenAt      DateTime? @map("last_seen_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, deviceId])
+  @@index([status])
+  @@map("devices")
+}
+

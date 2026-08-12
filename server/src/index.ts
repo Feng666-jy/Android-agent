@@ -7,6 +7,8 @@ import { logger } from './utils/logger.js'
 import routes from './routes/index.js'
 import { errorHandler } from './middleware/error.js'
 import { connectDatabase } from './prisma.js'
+import { createServer } from 'node:http'
+import { deviceBridge } from './services/android/bridge.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
@@ -28,9 +30,13 @@ app.use(errorHandler)
 async function start(): Promise<void> {
   await connectDatabase()
 
-  app.listen(PORT, () => {
+  const server = createServer(app)
+  deviceBridge.attach(server, '/ws/device')
+
+  server.listen(PORT, () => {
     logger.info(`Server running on http://localhost:${PORT}`)
     logger.info(`Health check: http://localhost:${PORT}/health`)
+    logger.info(`Device bridge: ws://localhost:${PORT}/ws/device`)
   })
 }
 
