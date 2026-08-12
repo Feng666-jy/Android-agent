@@ -8,9 +8,10 @@ import org.json.JSONObject
  */
 object AccessibilityExecutor {
 
-    fun execute(tool: String, args: JSONObject): Result<Any> = try {
+    fun execute(tool: String, args: JSONObject): Result<Any> {
         val service = AndroidAccessibilityService.instance
             ?: return Result.failure(Exception("无障碍服务未启用：请在系统设置 → 无障碍中开启「Android Agent 无障碍」"))
+        return try {
         when (tool) {
             "get_ui_tree" -> Result.success(service.dumpUiTree())
 
@@ -65,7 +66,8 @@ object AccessibilityExecutor {
 
             else -> Result.failure(Exception("unknown a11y tool: $tool"))
         }
-    } catch (e: Exception) {
-        Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

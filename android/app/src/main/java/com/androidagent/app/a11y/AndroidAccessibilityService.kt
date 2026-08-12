@@ -130,7 +130,7 @@ class AndroidAccessibilityService : AccessibilityService() {
         return found.firstOrNull()
     }
 
-    fun tap(x: Int, y: Int): Boolean = dispatchGesture(listOf(gesturePath(x, y, x, y, 60)), null, null)
+    fun tap(x: Int, y: Int): Boolean = dispatchGesture(gesture(gesturePath(x, y, x, y, 60L)), null, null)
 
     /** 输入文本：先 focus，再 ACTION_SET_TEXT */
     fun input(text: String): Boolean {
@@ -156,7 +156,7 @@ class AndroidAccessibilityService : AccessibilityService() {
         val rect = Rect()
         val root = rootInActiveWindow ?: return false
         root.getBoundsInScreen(rect)
-        val duration = durationMs.coerceIn(50, 2000)
+        val duration = durationMs.coerceIn(50, 2000).toLong()
         val (sx1, sy1, sx2, sy2) = when (direction) {
             "up" -> intArrayOf(rect.centerX(), rect.bottom - 50, rect.centerX(), rect.top + 50)
             "down" -> intArrayOf(rect.centerX(), rect.top + 50, rect.centerX(), rect.bottom - 50)
@@ -164,10 +164,13 @@ class AndroidAccessibilityService : AccessibilityService() {
             "right" -> intArrayOf(rect.left + 50, rect.centerY(), rect.right - 50, rect.centerY())
             else -> intArrayOf(x1 ?: rect.centerX(), y1 ?: rect.centerY(), x2 ?: rect.centerX(), y2 ?: rect.centerY())
         }
-        return dispatchGesture(listOf(gesturePath(sx1, sy1, sx2, sy2, duration)), null, null)
+        return dispatchGesture(gesture(gesturePath(sx1, sy1, sx2, sy2, duration)), null, null)
     }
 
     fun back(): Boolean = performGlobalAction(GLOBAL_ACTION_BACK)
+
+    private fun gesture(stroke: GestureDescription.StrokeDescription): GestureDescription =
+        GestureDescription.Builder().addStroke(stroke).build()
 
     private fun gesturePath(x1: Int, y1: Int, x2: Int, y2: Int, duration: Long): GestureDescription.StrokeDescription {
         val path = Path().apply { moveTo(x1.toFloat(), y1.toFloat()); lineTo(x2.toFloat(), y2.toFloat()) }

@@ -46,8 +46,6 @@ dependencies {
     implementation 'org.json:json:20231013'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
-    // Capacitor
-    implementation 'com.getcapacitor:capacitor:6.1.2'
-    implementation 'com.getcapacitor:capacitor-android:6.1.2'
-    implementation 'com.getcapacitor:capacitor-core:6.1.2'
+    // Capacitor：本地子工程（node_modules/@capacitor/android/capacitor，settings.gradle 引入）
+    implementation project(':capacitor-android')
 }

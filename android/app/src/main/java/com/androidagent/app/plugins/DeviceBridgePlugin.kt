@@ -90,7 +90,7 @@ class DeviceBridgePlugin : Plugin() {
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                call.reject("connect failed: ${t.message}", t)
+                call.reject("connect failed: ${t.message}", Exception(t))
                 scheduleReconnect(serverUrl, token)
             }
 
@@ -122,7 +122,7 @@ class DeviceBridgePlugin : Plugin() {
         payload.put("osVersion", android.os.Build.VERSION.RELEASE)
         payload.put("appVersion", appVersion())
         payload.put("capabilities", capabilities())
-        send(JSONObject().put("type", "hello").put("deviceId", deviceId()).put("ts", now()).put("payload", payload))
+        send(JSONObject().put("type", "hello").put("deviceId", deviceId()).put("ts", now()).put("payload", payload).toString())
     }
 
     private fun appVersion(): String =
@@ -136,7 +136,7 @@ class DeviceBridgePlugin : Plugin() {
         val msg = try { JSONObject(text) } catch (e: Exception) { return }
         when (msg.optString("type")) {
             "command" -> dispatchCommand(msg)
-            "ping" -> send(JSONObject().put("type", "heartbeat").put("deviceId", deviceId()).put("ts", now()))
+            "ping" -> send(JSONObject().put("type", "heartbeat").put("deviceId", deviceId()).put("ts", now()).toString())
             "hello_ack" -> Unit
         }
     }
@@ -168,7 +168,7 @@ class DeviceBridgePlugin : Plugin() {
                 payload.put("ok", false)
                 payload.put("error", result.exceptionOrNull()?.message ?: "unknown error")
             }
-            send(JSONObject().put("type", "command_result").put("deviceId", deviceId()).put("ts", now()).put("payload", payload))
+            send(JSONObject().put("type", "command_result").put("deviceId", deviceId()).put("ts", now()).put("payload", payload).toString())
         }
     }
 
@@ -179,7 +179,7 @@ class DeviceBridgePlugin : Plugin() {
         scope.launch {
             kotlinx.coroutines.delay(delay)
             if (ws == null) {
-                val call = PluginCall(JSObject().put("serverUrl", serverUrl).put("token", token), "connect", "", null)
+                val call = PluginCall(null, "DeviceBridge", UUID.randomUUID().toString(), "connect", JSObject().put("serverUrl", serverUrl).put("token", token))
                 connect(call)
             }
         }
