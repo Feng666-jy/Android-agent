@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import type { JwtPayload } from '../types/index.js'
 import { unauthorized } from '../utils/response.js'
+import { verifyApiKey } from '../services/api-key/service.js'
 
 declare global {
   namespace Express {
@@ -19,7 +20,11 @@ export function verifyToken(token: string): JwtPayload {
   return jwt.verify(token, JWT_SECRET!) as JwtPayload
 }
 
-export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+export async function authMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     unauthorized(res, 'No token provided')
@@ -27,6 +32,27 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   const token = authHeader.split(' ')[1]
+  // Phase 5（T38）：sk_ 前缀视为 API Key（只存哈希，校验 O(1)）
+  if (token.startsWith('sk_')) {
+    try {
+      const identity = await verifyApiKey(token)
+      if (!identity) {
+        unauthorized(res, 'Invalid API key')
+        return
+      }
+      req.user = {
+        userId: identity.userId,
+        apiKeyId: identity.apiKeyId,
+        apiKeyScope: identity.scope
+      }
+      next()
+      return
+    } catch {
+      unauthorized(res, 'Invalid API key')
+      return
+    }
+  }
+
   try {
     req.user = verifyToken(token)
     next()

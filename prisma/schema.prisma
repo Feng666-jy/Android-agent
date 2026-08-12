@@ -159,6 +159,7 @@ model User {
   password  String
   email     String   @unique
   avatar    String?
+    orgId         String?  @map("org_id") // 默认组织（Phase 5 多租户）
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -166,6 +167,12 @@ model User {
   agents       Agent[]
   approvals    Approval[]
   conversations Conversation[]
+    organizations Organization[] @relation("OrgOwner")
+    memberships   OrgMember[]
+    subscriptions Subscription[]
+    usageEvents   UsageEvent[]
+    invoices      Invoice[]
+    apiKeys       ApiKey[]
 
   @@map("users")
 }
@@ -517,3 +524,158 @@ model WorkflowRun {
 }
 
 
+
+
+/// Organization（组织 / 租户 — Phase 5 T37 多租户）
+model Organization {
+  id           String   @id @default(cuid())
+  name         String
+  ownerUserId  Int      @map("owner_user_id")
+  description  String   @default("")
+  settingsJson String   @default("{}") @map("settings_json")
+  status       String   @default("active") // active | disabled
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  owner User @relation("OrgOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  members OrgMember[]
+
+  @@index([ownerUserId])
+  @@map("organizations")
+}
+
+/// OrgMember（组织成员 — 角色 owner | admin | member）
+model OrgMember {
+  id        String   @id @default(cuid())
+  orgId     String   @map("org_id")
+  userId    Int      @map("user_id")
+  role      String   @default("member") // owner | admin | member
+  createdAt DateTime @default(now()) @map("created_at")
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([userId])
+  @@map("org_members")
+}
+
+/// BillingPlan（套餐 — Phase 5 T36：free / pro / enterprise）
+model BillingPlan {
+  id                 String  @id @default(cuid())
+  code               String  @unique
+  name               String
+  description        String  @default("")
+  priceMonthlyCents  Int     @default(0) @map("price_monthly_cents")
+  currency           String  @default("CNY")
+  quotaJson          String  @default("{}") @map("quota_json")
+  featuresJson       String  @default("[]") @map("features_json")
+  isDefault          Boolean @default(false) @map("is_default")
+  enabled            Boolean @default(true)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  subscriptions Subscription[]
+
+  @@map("billing_plans")
+}
+
+/// Subscription（用户订阅）
+model Subscription {
+  id           String   @id @default(cuid())
+  userId       Int      @map("user_id")
+  planId       String   @map("plan_id")
+  status       String   @default("active") // active | trialing | expired | canceled
+  startedAt    DateTime @default(now()) @map("started_at")
+  expiresAt    DateTime? @map("expires_at")
+  quotaResetAt DateTime @default(now()) @map("quota_reset_at")
+  metadataJson String   @default("{}") @map("metadata_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+/// UsageEvent（用户级用量事件 — 事件溯源，读时聚合，不可变）
+model UsageEvent {
+  id           String   @id @default(cuid())
+  userId       Int      @map("user_id")
+  orgId        String?  @map("org_id")
+  modelId      String?  @map("model_id")
+  runId        String?  @map("run_id")
+  source       String   @default("chat") // chat | agent | workflow | api
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  cachedTokens Int      @default(0) @map("cached_tokens")
+  totalTokens  Int      @default(0) @map("total_tokens")
+  costCents    Int      @default(0) @map("cost_cents")
+  currency     String   @default("CNY")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([modelId])
+  @@map("usage_events")
+}
+
+/// Invoice（月度账单）
+model Invoice {
+  id             String   @id @default(cuid())
+  userId         Int      @map("user_id")
+  subscriptionId String?  @map("subscription_id")
+  periodStart    DateTime @map("period_start")
+  periodEnd      DateTime @map("period_end")
+  amountCents    Int      @default(0) @map("amount_cents")
+  currency       String   @default("CNY")
+  status         String   @default("draft") // draft | issued | paid | void
+  lineItemsJson  String   @default("[]") @map("line_items_json")
+  paidAt         DateTime? @map("paid_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, periodStart])
+  @@map("invoices")
+}
+
+/// ModelPrice（模型计价 — 每百万 token 单价，单位：分）
+model ModelPrice {
+  id                      String  @id @default(cuid())
+  modelId                 String  @map("model_id")
+  currency                String  @default("CNY")
+  inputPerMillionCents    Int     @default(0) @map("input_per_million_cents")
+  outputPerMillionCents   Int     @default(0) @map("output_per_million_cents")
+  cachedDiscount          Float   @default(0.9) @map("cached_discount")
+  enabled                 Boolean @default(true)
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@unique([modelId, currency])
+  @@map("model_prices")
+}
+
+/// ApiKey（用户 API Key — 只存哈希，明文仅创建时返回一次）
+model ApiKey {
+  id         String    @id @default(cuid())
+  userId     Int       @map("user_id")
+  name       String
+  prefix     String
+  keyHash    String    @unique @map("key_hash")
+  scope      String    @default("agent") // agent | billing | all
+  status     String    @default("active") // active | revoked
+  lastUsedAt DateTime? @map("last_used_at")
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("api_keys")
+}

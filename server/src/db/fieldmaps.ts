@@ -33,6 +33,7 @@ export const TABLES: Record<string, TableConfig> = {
       password: 'password',
       email: 'email',
       avatar: 'avatar',
+      orgId: 'org_id',
       createdAt: 'created_at',
       updatedAt: 'updated_at'
     },
@@ -430,6 +431,133 @@ export const TABLES: Record<string, TableConfig> = {
       updatedAt: 'updated_at'
     },
     booleans: ['enabled']
+  },
+  organization: {
+    table: 'organizations',
+    fields: {
+      id: 'id',
+      name: 'name',
+      ownerUserId: 'owner_user_id',
+      description: 'description',
+      settingsJson: 'settings_json',
+      status: 'status',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: []
+  },
+  orgMember: {
+    table: 'org_members',
+    fields: {
+      id: 'id',
+      orgId: 'org_id',
+      userId: 'user_id',
+      role: 'role',
+      createdAt: 'created_at'
+    },
+    booleans: []
+  },
+  billingPlan: {
+    table: 'billing_plans',
+    fields: {
+      id: 'id',
+      code: 'code',
+      name: 'name',
+      description: 'description',
+      priceMonthlyCents: 'price_monthly_cents',
+      currency: 'currency',
+      quotaJson: 'quota_json',
+      featuresJson: 'features_json',
+      isDefault: 'is_default',
+      enabled: 'enabled',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: ['isDefault', 'enabled']
+  },
+  subscription: {
+    table: 'subscriptions',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      planId: 'plan_id',
+      status: 'status',
+      startedAt: 'started_at',
+      expiresAt: 'expires_at',
+      quotaResetAt: 'quota_reset_at',
+      metadataJson: 'metadata_json',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: []
+  },
+  usageEvent: {
+    table: 'usage_events',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      orgId: 'org_id',
+      modelId: 'model_id',
+      runId: 'run_id',
+      source: 'source',
+      inputTokens: 'input_tokens',
+      outputTokens: 'output_tokens',
+      cachedTokens: 'cached_tokens',
+      totalTokens: 'total_tokens',
+      costCents: 'cost_cents',
+      currency: 'currency',
+      createdAt: 'created_at'
+    },
+    booleans: []
+  },
+  invoice: {
+    table: 'invoices',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      subscriptionId: 'subscription_id',
+      periodStart: 'period_start',
+      periodEnd: 'period_end',
+      amountCents: 'amount_cents',
+      currency: 'currency',
+      status: 'status',
+      lineItemsJson: 'line_items_json',
+      paidAt: 'paid_at',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: []
+  },
+  modelPrice: {
+    table: 'model_prices',
+    fields: {
+      id: 'id',
+      modelId: 'model_id',
+      currency: 'currency',
+      inputPerMillionCents: 'input_per_million_cents',
+      outputPerMillionCents: 'output_per_million_cents',
+      cachedDiscount: 'cached_discount',
+      enabled: 'enabled',
+      updatedAt: 'updated_at'
+    },
+    booleans: ['enabled']
+  },
+  apiKey: {
+    table: 'api_keys',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      name: 'name',
+      prefix: 'prefix',
+      keyHash: 'key_hash',
+      scope: 'scope',
+      status: 'status',
+      lastUsedAt: 'last_used_at',
+      expiresAt: 'expires_at',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: []
   }
 }
 export const RELATIONS: Record<string, Record<string, RelationConfig>> = {

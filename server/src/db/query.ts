@@ -78,9 +78,15 @@ function buildCondition(cfg: TableConfig, field: string, value: unknown): SqlPar
       }
     }
     const COMPARATORS: Record<string, string> = { lt: '<', lte: '<=', gt: '>', gte: '>=' }
-    for (const [op, symbol] of Object.entries(COMPARATORS)) {
-      if (op in ops) {
-        return { sql: `"${col}" ${symbol} ?`, params: [toDbValue(ops[op])] }
+    const comparators = Object.entries(COMPARATORS).filter(([op]) => op in ops)
+    if (comparators.length > 0) {
+      const clauses = comparators.map(([op, symbol]) => ({
+        sql: `"${col}" ${symbol} ?`,
+        params: [toDbValue(ops[op])]
+      }))
+      return {
+        sql: clauses.map(c => c.sql).join(' AND '),
+        params: clauses.flatMap(c => c.params)
       }
     }
     if ('not' in ops) {

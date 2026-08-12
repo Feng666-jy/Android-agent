@@ -27,6 +27,7 @@ import {
 import { loadSkills } from '../skills/loader.js'
 import { buildSkillPrompt } from '../skills/injector.js'
 import { getRelevantMemories, renderMemoryBlock } from '../memory/index.js'
+import { recordUsage } from '../billing/usage.js'
 import { compactRunToMemory } from '../memory/compactor.js'
 import { saveMemory } from '../memory/store.js'
 import { LLMPlanner } from './planner.js'
@@ -427,6 +428,8 @@ export class AgentLoop {
     // Phase 4：任务结束后写入 episodic 记忆（异步、静默失败）
     if (status === 'completed' || status === 'failed') {
       void this.writeRunMemory()
+      // Phase 5：终态写入用量事件（异步、静默失败）
+      void this.writeRunUsage()
     }
     void store.silent(
       'save stats',
@@ -466,6 +469,24 @@ export class AgentLoop {
       })
     } catch (err) {
       logger.warn(`[loop] write memory failed: ${(err as Error)?.message ?? String(err)}`)
+    }
+  }
+
+  /** Phase 5：终态写入用量事件（静默失败，不影响主流程） */
+  private async writeRunUsage(): Promise<void> {
+    try {
+      const used = this.run.tokenUsed
+      if ((used.totalTokens ?? 0) <= 0) return
+      await recordUsage({
+        userId: this.run.userId,
+        modelId: this.run.modelId,
+        runId: this.run.id,
+        source: 'agent',
+        inputTokens: used.inputTokens ?? 0,
+        outputTokens: used.outputTokens ?? 0
+      })
+    } catch {
+      // 埋点失败不影响主流程
     }
   }
 

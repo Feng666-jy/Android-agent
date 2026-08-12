@@ -11,6 +11,7 @@ import { randomUUID } from 'node:crypto'
 import { toolRouter } from '../agent-v2/tool-router.js'
 import { llmService } from '../llm/index.js'
 import { saveMemory } from '../memory/store.js'
+import { recordUsage } from '../billing/usage.js'
 import type { WorkflowDef, WorkflowRunContext, WorkflowRunRecord, WorkflowStep } from './types.js'
 import type { MemoryKind } from '../memory/types.js'
 
@@ -134,6 +135,13 @@ async function executeStep(
         STEP_TIMEOUT_MS,
         `Step ${step.id} timed out`
       )
+      await recordUsage({
+        userId: ctx.userId ?? workflow.userId,
+        modelId: String(modelId),
+        source: 'workflow',
+        inputTokens: llmService.countTokens(prompt),
+        outputTokens: llmService.countTokens(content)
+      })
       return content
     }
     case 'memory_write': {

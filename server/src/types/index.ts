@@ -18,7 +18,10 @@ export interface PaginatedResult<T> {
 
 export interface JwtPayload {
   userId: number
-  username: string
+  /** API Key 认证时填充（Phase 5 T38） */
+  apiKeyId?: string
+  apiKeyScope?: string
+  username?: string
 }
 
 export interface RegisterInput {
