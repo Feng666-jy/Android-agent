@@ -1,4 +1,5 @@
-﻿const TOKEN_KEY = 'app_token'
+const TOKEN_KEY = 'app_token'
+const SERVER_BASE_KEY = 'server_base_url'
 const THEME_KEY = 'app_theme'
 
 export const storage = {
@@ -12,6 +13,14 @@ export const storage = {
 
   removeToken(): void {
     localStorage.removeItem(TOKEN_KEY)
+  },
+
+  getServerBase(): string {
+    return localStorage.getItem(SERVER_BASE_KEY) || ''
+  },
+
+  setServerBase(url: string): void {
+    localStorage.setItem(SERVER_BASE_KEY, url)
   },
 
   getTheme(): string | null {

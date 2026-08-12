@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import { DeviceBridge, isCapacitorNative } from '@/capacitor/device-bridge'
 import { devicesAPI, type DeviceRecord } from '@/api/devices'
+import { storage } from '@/utils/storage'
 
 const isNative = ref(false)
 const connecting = ref(false)
@@ -10,8 +11,14 @@ const connected = ref(false)
 const myDeviceId = ref('')
 const statusText = ref('未连接')
 
-const serverUrl = ref('')
-const token = ref('')
+function defaultServerUrl(): string {
+  const base = storage.getServerBase()
+  if (!base) return ''
+  return 'ws://' + base.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+}
+
+const serverUrl = ref(defaultServerUrl())
+const token = ref(storage.getToken() || '')
 const loginForm = ref({ username: '', password: '' })
 const gettingToken = ref(false)
 

@@ -15,6 +15,12 @@ request.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = 'Bearer ' + token
     }
+    // 手机端（Capacitor WebView）：登录时保存的服务器地址优先，
+    // 把相对路径 /api/xxx 改写为 http://电脑IP:3000/api/xxx
+    const serverBase = storage.getServerBase()
+    if (serverBase && config.url && !config.url.startsWith('http')) {
+      config.url = serverBase.replace(/\/+$/, '') + '/api' + config.url
+    }
     return config
   },
   (error: AxiosError) => {

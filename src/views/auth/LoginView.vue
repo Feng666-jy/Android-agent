@@ -1,34 +1,45 @@
-﻿<script setup lang="ts">
-import { reactive, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useUserStore } from "@/stores/user"
-import { showToast } from "vant"
-import GlassCard from "@/components/GlassCard.vue"
-import type { LoginForm } from "@/types"
+<script setup lang="ts">
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import { showToast } from 'vant'
+import GlassCard from '@/components/GlassCard.vue'
+import type { LoginForm } from '@/types'
+import { isCapacitorNative } from '@/capacitor/device-bridge'
+import { storage } from '@/utils/storage'
 
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
+const isNative = isCapacitorNative()
+const serverBase = ref(storage.getServerBase())
 
 const form = reactive<LoginForm>({
-  username: "",
-  password: ""
+  username: '',
+  password: ''
 })
 
 async function handleLogin() {
+  if (isNative && !serverBase.value.trim()) {
+    showToast('手机端请先填写服务器地址（http://电脑IP:3000）')
+    return
+  }
   if (!form.username.trim()) {
-    showToast("请输入用户名")
+    showToast('请输入用户名')
     return
   }
   if (!form.password.trim()) {
-    showToast("请输入密码")
+    showToast('请输入密码')
     return
   }
 
   loading.value = true
   try {
+    if (serverBase.value.trim()) {
+      storage.setServerBase(serverBase.value.trim().replace(/\/+$/, ''))
+    }
     await userStore.login(form)
-    router.push("/home")
+    router.push('/home')
   } catch {
     // Error handled by interceptor
   } finally {
@@ -37,7 +48,7 @@ async function handleLogin() {
 }
 
 function goRegister() {
-  router.push("/register")
+  router.push('/register')
 }
 </script>
 
@@ -47,7 +58,14 @@ function goRegister() {
       <div class="login-page__logo">
         <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
           <rect width="64" height="64" rx="16" fill="#1A1A1A" />
-          <path d="M20 44V24l12 10 12-10v20" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          <path
+            d="M20 44V24l12 10 12-10v20"
+            stroke="white"
+            stroke-width="3"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
       <h1 class="login-page__title">Android Agent</h1>
@@ -58,6 +76,14 @@ function goRegister() {
       <h2 class="login-page__card-title">欢迎回来</h2>
 
       <van-form @submit="handleLogin">
+        <van-field
+          v-if="isNative"
+          v-model="serverBase"
+          name="serverBase"
+          label="服务器"
+          placeholder="http://电脑IP:3000（必填）"
+          clearable
+        />
         <van-field
           v-model="form.username"
           name="username"
@@ -99,7 +125,7 @@ function goRegister() {
 </template>
 
 <style lang="scss" scoped>
-@use "@/styles/variables" as *;
+@use '@/styles/variables' as *;
 
 .login-page {
   min-height: 100vh;
@@ -108,7 +134,7 @@ function goRegister() {
   align-items: center;
   justify-content: center;
   padding: 0 20px;
-  background: #FFFFFF;
+  background: #ffffff;
 
   &__brand {
     display: flex;
@@ -126,14 +152,14 @@ function goRegister() {
     font-weight: 700;
     color: $text-color;
     margin: 0 0 6px;
-    font-family: "Inter", "HarmonyOS Sans", sans-serif;
+    font-family: 'Inter', 'HarmonyOS Sans', sans-serif;
   }
 
   &__subtitle {
     font-size: 14px;
     color: $text-color-secondary;
     margin: 0;
-    font-family: "Inter", "HarmonyOS Sans", sans-serif;
+    font-family: 'Inter', 'HarmonyOS Sans', sans-serif;
   }
 
   &__card {
@@ -148,7 +174,7 @@ function goRegister() {
     margin: 0 0 24px;
     text-align: center;
     color: $text-color;
-    font-family: "Inter", "HarmonyOS Sans", sans-serif;
+    font-family: 'Inter', 'HarmonyOS Sans', sans-serif;
   }
 
   &__footer {
@@ -159,7 +185,7 @@ function goRegister() {
     margin-top: 20px;
     font-size: 13px;
     color: $text-color-secondary;
-    font-family: "Inter", "HarmonyOS Sans", sans-serif;
+    font-family: 'Inter', 'HarmonyOS Sans', sans-serif;
   }
 
   &__link {
