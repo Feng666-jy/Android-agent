@@ -5,6 +5,7 @@ export { agentAPI, makeClientRunId } from './agent'
 export { aiResourcesAPI } from './ai-resources'
 export { orgAPI } from './org'
 export { apiKeysAPI } from './api-keys'
+export { devicesAPI } from './devices'
 export type {
   AgentRunResponse,
   AgentRunInput,

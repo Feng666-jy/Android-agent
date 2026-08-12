@@ -118,6 +118,12 @@ const router = createRouter({
               meta: { title: '工具管理' }
             },
             {
+              path: 'devices',
+              name: 'device-manager',
+              component: () => import('@/views/devices/DeviceManager.vue'),
+              meta: { title: '设备连接' }
+            },
+            {
               path: 'ai-resources',
               name: 'ai-resources',
               component: () => import('@/views/ai-resources/AiResourcesView.vue'),

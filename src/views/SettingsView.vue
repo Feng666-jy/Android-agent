@@ -26,6 +26,10 @@ function goOrgs() {
 function goApiKeys() {
   router.push('/workspace/settings/api-keys')
 }
+
+function goDevices() {
+  router.push('/workspace/settings/devices')
+}
 </script>
 
 <template>
@@ -112,6 +116,21 @@ function goApiKeys() {
         </div>
         <div class="settings__item" @click="goApiKeys">
           <span class="settings__item-label">API Key</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <div class="settings__item" @click="goDevices">
+          <span class="settings__item-label">设备连接</span>
           <svg
             width="16"
             height="16"
