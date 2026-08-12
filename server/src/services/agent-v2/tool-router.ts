@@ -19,9 +19,11 @@ import { buildDeviceTools } from '../android/tools.js'
 import { deviceRegistry } from '../android/device-registry.js'
 import { kindForDeviceTool, withCapabilityCheck } from '../android/executor-factory.js'
 import { buildReadSkillTool, loadSkills } from '../skills/loader.js'
+import { getRelevantMemories, saveMemory } from '../memory/index.js'
+import { executeWorkflow, getWorkflow } from '../workflow/index.js'
 import { logger } from '../../utils/logger.js'
 
-export type ToolSource = 'builtin' | 'custom' | 'mcp' | 'skill' | 'device'
+export type ToolSource = 'builtin' | 'custom' | 'mcp' | 'skill' | 'device' | 'memory' | 'workflow'
 
 export interface RouterToolEntry {
   tool: AgentTool
@@ -74,7 +76,7 @@ export class ToolRouter {
     // 2) 自定义工具（tools 表 source=custom，全局或本人）
     // 选择性清理：device 来源工具由 refreshDeviceTools 独立管理（不随全量清空）
     for (const [name, source] of [...this.sources]) {
-      if (source !== 'device') {
+      if (source !== 'device' && source !== 'memory' && source !== 'workflow') {
         this.dynamic.delete(name)
         this.sources.delete(name)
         this.rowIds.delete(name)
@@ -105,6 +107,118 @@ export class ToolRouter {
     } catch (err) {
       logger.warn(`[tool-router] mcp sync failed: ${(err as Error)?.message ?? String(err)}`)
     }
+    // 5) Memory / Workflow 工具（Phase 4：内置能力，总是注册）
+    this.registerMemoryWorkflowTools(userId)
+  }
+
+  /**
+   * Memory / Workflow 工具（Phase 4）：记忆存取 + 工作流执行（内置能力，总是注册）
+   */
+  private registerMemoryWorkflowTools(userId: number): void {
+    this.dynamic.set('memory_save', {
+      name: 'memory_save',
+      description:
+        '保存一条长期记忆（kind: episodic 任务经历 / semantic 事实 / preference 偏好；content 为记忆内容；summary 可选摘要；importance 0-1 重要性）。',
+      parameters: {
+        type: 'object',
+        properties: {
+          kind: {
+            type: 'string',
+            enum: ['episodic', 'semantic', 'preference'],
+            description: '记忆类型（默认 episodic）'
+          },
+          content: { type: 'string', description: '记忆内容' },
+          summary: { type: 'string', description: '可选摘要' },
+          importance: { type: 'number', description: '重要性 0-1（默认 0.5）' }
+        },
+        required: ['content']
+      },
+      execute: async args => {
+        const content = String(args.content ?? '').trim()
+        if (!content) return { ok: false, output: 'content required' }
+        await saveMemory(userId, {
+          kind: (args.kind as any) ?? 'episodic',
+          content,
+          summary: args.summary ? String(args.summary) : undefined,
+          importance: typeof args.importance === 'number' ? args.importance : 0.5,
+          source: 'agent'
+        })
+        return { ok: true, output: JSON.stringify({ saved: true }) }
+      }
+    })
+    this.sources.set('memory_save', 'memory')
+
+    this.dynamic.set('memory_recall', {
+      name: 'memory_recall',
+      description:
+        '检索历史记忆（query 为检索词；limit 返回条数，默认 5）。用于回忆用户偏好、历史任务结果等。',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: '检索关键词' },
+          limit: { type: 'integer', description: '返回条数（1-20）' }
+        },
+        required: ['query']
+      },
+      execute: async args => {
+        const hits = await getRelevantMemories(userId, String(args.query ?? ''), {
+          limit: typeof args.limit === 'number' ? args.limit : 5
+        })
+        if (hits.length === 0) return { ok: true, output: '未找到相关记忆' }
+        return {
+          ok: true,
+          output: JSON.stringify(
+            hits.map(h => ({ kind: h.kind, content: h.content, summary: h.summary })),
+            null,
+            2
+          )
+        }
+      }
+    })
+    this.sources.set('memory_recall', 'memory')
+
+    this.dynamic.set('run_workflow', {
+      name: 'run_workflow',
+      description:
+        '执行一个已保存的工作流（workflowId 为工作流 ID；input 为入参对象，步骤中可用 {{input.xxx}} 引用）。',
+      parameters: {
+        type: 'object',
+        properties: {
+          workflowId: { type: 'string', description: '工作流 ID' },
+          input: { type: 'object', description: '工作流入参' }
+        },
+        required: ['workflowId']
+      },
+      execute: async args => {
+        const workflow = await getWorkflow(userId, String(args.workflowId ?? ''))
+        if (!workflow)
+          return { ok: false, output: 'Workflow not found: ' + String(args.workflowId ?? '') }
+        if (!workflow.enabled)
+          return { ok: false, output: 'Workflow ' + workflow.name + ' is disabled' }
+        const record = await executeWorkflow(
+          workflow,
+          (args.input as Record<string, unknown>) ?? {},
+          {
+            userId,
+            modelId: args.modelId ? String(args.modelId) : undefined
+          }
+        )
+        if (record.status !== 'completed') {
+          return {
+            ok: false,
+            output:
+              'Workflow ' +
+              workflow.name +
+              ' ' +
+              record.status +
+              ': ' +
+              (record.error ?? 'unknown error')
+          }
+        }
+        return { ok: true, output: JSON.stringify(record.output ?? {}) }
+      }
+    })
+    this.sources.set('run_workflow', 'workflow')
   }
 
   /**

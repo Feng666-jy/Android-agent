@@ -280,6 +280,60 @@ export const TABLES: Record<string, TableConfig> = {
     },
     booleans: []
   },
+  memory: {
+    table: 'memories',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      conversationId: 'conversation_id',
+      agentId: 'agent_id',
+      runId: 'run_id',
+      kind: 'kind',
+      content: 'content',
+      summary: 'summary',
+      importance: 'importance',
+      accessCount: 'access_count',
+      lastAccessAt: 'last_access_at',
+      expiresAt: 'expires_at',
+      source: 'source',
+      metadataJson: 'metadata_json',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: []
+  },
+  workflow: {
+    table: 'workflows',
+    fields: {
+      id: 'id',
+      userId: 'user_id',
+      name: 'name',
+      description: 'description',
+      trigger: 'trigger',
+      stepsJson: 'steps_json',
+      enabled: 'enabled',
+      version: 'version',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
+    },
+    booleans: ['enabled']
+  },
+  workflowRun: {
+    table: 'workflow_runs',
+    fields: {
+      id: 'id',
+      workflowId: 'workflow_id',
+      userId: 'user_id',
+      status: 'status',
+      inputJson: 'input_json',
+      outputJson: 'output_json',
+      error: 'error',
+      startedAt: 'started_at',
+      finishedAt: 'finished_at',
+      createdAt: 'created_at'
+    },
+    booleans: []
+  },
   device: {
     table: 'devices',
     fields: {

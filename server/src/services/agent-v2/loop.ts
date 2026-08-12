@@ -10,6 +10,8 @@
  */
 
 import { randomUUID } from 'node:crypto'
+import { logger } from '../../utils/logger.js'
+import { prisma } from '../../prisma.js'
 import { llmService } from '../llm/index.js'
 import type { ChatMessage, ToolCall, TokenUsage } from '../llm/types.js'
 import { ToolRegistry } from '../agent/index.js'
@@ -24,6 +26,9 @@ import {
 } from './tool-permissions.js'
 import { loadSkills } from '../skills/loader.js'
 import { buildSkillPrompt } from '../skills/injector.js'
+import { getRelevantMemories, renderMemoryBlock } from '../memory/index.js'
+import { compactRunToMemory } from '../memory/compactor.js'
+import { saveMemory } from '../memory/store.js'
 import { LLMPlanner } from './planner.js'
 import { ContextManager } from './context.js'
 import { agentEventBus, makeEvent, type AgentEvent, type AgentEventType } from './events.js'
@@ -113,6 +118,7 @@ export class AgentLoop {
   private readonly planner: LLMPlanner
   private permissionRules: ToolPermissionRule[] = []
   private skillPrompt = ''
+  private memoryBlock = ''
   private readonly context: ContextManager
   private readonly approvalHandler?: ApprovalHandler
   private readonly onEvent?: (evt: AgentEvent) => void
@@ -157,6 +163,16 @@ export class AgentLoop {
       this.permissionRules = await listToolPermissionRules(this.run.userId, this.run.agentId)
     }
     this.skillPrompt = buildSkillPrompt(await loadSkills(this.run.userId))
+
+    // Phase 4：加载历史记忆（用户级；agent 配置 enable_memory=0 时跳过）
+    if (await this.memoryEnabled()) {
+      try {
+        const hits = await getRelevantMemories(this.run.userId, this.run.task, { limit: 5 })
+        this.memoryBlock = renderMemoryBlock(hits)
+      } catch {
+        this.memoryBlock = ''
+      }
+    }
 
     await this.setStatus('planning')
     try {
@@ -277,7 +293,8 @@ export class AgentLoop {
         role: 'system',
         content:
           buildRunnerSystemPrompt(this.run.task, planText) +
-          (this.skillPrompt ? '\n\n' + this.skillPrompt : '')
+          (this.skillPrompt ? '\n\n' + this.skillPrompt : '') +
+          (this.memoryBlock ? this.memoryBlock : '')
       },
       ...this.run.messages
     ]
@@ -407,6 +424,10 @@ export class AgentLoop {
     if (result !== undefined) {
       void store.silent('save result', store.updateRunResult(this.run.id, result))
     }
+    // Phase 4：任务结束后写入 episodic 记忆（异步、静默失败）
+    if (status === 'completed' || status === 'failed') {
+      void this.writeRunMemory()
+    }
     void store.silent(
       'save stats',
       store.updateRunStats(this.run.id, {
@@ -415,6 +436,37 @@ export class AgentLoop {
       })
     )
     return this.run
+  }
+
+  /** agent 记忆开关：enable_memory 默认开启；配置为 0 时关闭 */
+  private async memoryEnabled(): Promise<boolean> {
+    if (!this.run.agentId) return true
+    try {
+      const agent = await prisma.agent.findFirst({ where: { id: this.run.agentId } })
+      return agent ? agent.enableMemory !== false : true
+    } catch {
+      return true
+    }
+  }
+
+  /** 把本次运行压缩为 episodic 记忆并入库（静默失败，不影响主流程） */
+  private async writeRunMemory(): Promise<void> {
+    try {
+      if (!(await this.memoryEnabled())) return
+      const { content, summary, importance } = compactRunToMemory(this.run)
+      await saveMemory(this.run.userId, {
+        kind: 'episodic',
+        content,
+        summary,
+        importance,
+        runId: this.run.id,
+        agentId: this.run.agentId,
+        conversationId: this.run.conversationId,
+        source: 'system'
+      })
+    } catch (err) {
+      logger.warn(`[loop] write memory failed: ${(err as Error)?.message ?? String(err)}`)
+    }
   }
 
   private finishEvent(status: RunStatus): AgentEventType {
