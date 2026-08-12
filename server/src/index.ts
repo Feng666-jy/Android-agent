@@ -1,4 +1,4 @@
-﻿import 'dotenv/config'
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -14,7 +14,12 @@ const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
 
 app.use(helmet({ contentSecurityPolicy: false }))
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }))
+// CORS：支持逗号分隔多 origin；Capacitor WebView origin 为 https://localhost
+const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((s: string) => s.trim())
+  .filter(Boolean)
+app.use(cors({ origin: corsOrigins, credentials: true }))
 app.use(morgan('dev'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))

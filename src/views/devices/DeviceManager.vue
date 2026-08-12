@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import { DeviceBridge, isCapacitorNative } from '@/capacitor/device-bridge'
 import { devicesAPI, type DeviceRecord } from '@/api/devices'
-import { userAPI } from '@/api/user'
 
 const isNative = ref(false)
 const connecting = ref(false)
@@ -48,11 +47,21 @@ async function fetchToken() {
   }
   gettingToken.value = true
   try {
-    const res = await userAPI.login({
-      username: loginForm.value.username,
-      password: loginForm.value.password
+    // 手机端 WebView 的 axios baseURL 指向手机自身（/api 相对路径），
+    // 这里直连用户填写的 serverUrl（ws:// → http://）完成登录。
+    let httpBase = serverUrl.value.trim().replace(/\/+$/, '')
+    httpBase = httpBase.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://')
+    const res = await fetch(`${httpBase}/api/user/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: loginForm.value.username,
+        password: loginForm.value.password
+      })
     })
-    token.value = res.data.token
+    const data = await res.json()
+    if (!res.ok || data.code !== 0) throw new Error(data.message || `登录失败 (HTTP ${res.status})`)
+    token.value = data.data.token
     showToast('Token 已获取')
   } catch (e) {
     showToast((e as Error).message || '登录失败')
