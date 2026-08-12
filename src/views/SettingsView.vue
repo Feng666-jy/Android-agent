@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -13,6 +13,18 @@ function goModels() {
 
 function goTools() {
   router.push('/workspace/settings/tools')
+}
+
+function goBilling() {
+  router.push('/workspace/settings/billing')
+}
+
+function goOrgs() {
+  router.push('/workspace/settings/orgs')
+}
+
+function goApiKeys() {
+  router.push('/workspace/settings/api-keys')
 }
 </script>
 
@@ -55,6 +67,51 @@ function goTools() {
         </div>
         <div class="settings__item" @click="goTools">
           <span class="settings__item-label">工具管理</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <div class="settings__item" @click="goBilling">
+          <span class="settings__item-label">计费中心</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <div class="settings__item" @click="goOrgs">
+          <span class="settings__item-label">组织管理</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+        <div class="settings__item" @click="goApiKeys">
+          <span class="settings__item-label">API Key</span>
           <svg
             width="16"
             height="16"

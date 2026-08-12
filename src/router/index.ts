@@ -1,4 +1,4 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { storage } from '@/utils/storage'
 
 const router = createRouter({
@@ -116,6 +116,24 @@ const router = createRouter({
               name: 'tool-manager',
               component: () => import('@/views/tools/ToolManager.vue'),
               meta: { title: '工具管理' }
+            },
+            {
+              path: 'billing',
+              name: 'billing',
+              component: () => import('@/views/billing/BillingView.vue'),
+              meta: { title: '计费中心' }
+            },
+            {
+              path: 'orgs',
+              name: 'org-manager',
+              component: () => import('@/views/org/OrgView.vue'),
+              meta: { title: '组织管理' }
+            },
+            {
+              path: 'api-keys',
+              name: 'api-keys',
+              component: () => import('@/views/api-keys/ApiKeysView.vue'),
+              meta: { title: 'API Key' }
             }
           ]
         }
