@@ -36,3 +36,6 @@ prisma/**/*.db
 *.pfx
 secrets/
 credentials/
+
+# IDE 本地配置
+.idea/
