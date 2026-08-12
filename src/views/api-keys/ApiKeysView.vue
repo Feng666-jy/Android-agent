@@ -19,7 +19,6 @@ const editForm = ref({ name: '', scope: 'agent' as ApiKeyScope })
 
 const scopeLabels: Record<string, string> = {
   agent: 'Agent 调用',
-  billing: '用量账单',
   all: '全部'
 }
 
@@ -155,7 +154,6 @@ async function saveEdit(item: ApiKeyRecord) {
       />
       <select v-model="newKey.scope" class="api-keys-view__select">
         <option value="agent">Agent 调用</option>
-        <option value="billing">用量账单</option>
         <option value="all">全部</option>
       </select>
       <input v-model="newKey.expiresAt" class="api-keys-view__input" type="date" />
@@ -200,7 +198,6 @@ async function saveEdit(item: ApiKeyRecord) {
           <input v-model="editForm.name" class="api-keys-view__input" maxlength="64" />
           <select v-model="editForm.scope" class="api-keys-view__select">
             <option value="agent">Agent 调用</option>
-            <option value="billing">用量账单</option>
             <option value="all">全部</option>
           </select>
           <div class="api-keys-view__item-actions">

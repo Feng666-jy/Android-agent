@@ -11,7 +11,7 @@ import { randomUUID } from 'node:crypto'
 import { toolRouter } from '../agent-v2/tool-router.js'
 import { llmService } from '../llm/index.js'
 import { saveMemory } from '../memory/store.js'
-import { recordUsage } from '../billing/usage.js'
+import { recordUsage } from '../ai-resource/usage.js'
 import type { WorkflowDef, WorkflowRunContext, WorkflowRunRecord, WorkflowStep } from './types.js'
 import type { MemoryKind } from '../memory/types.js'
 
@@ -130,6 +130,7 @@ async function executeStep(
       const chat = ctx.chat ?? defaultChat
       const modelId = step.args?.modelId ?? ctx.modelId
       if (!modelId) throw new Error(`Step ${step.id}: modelId required`)
+      const startedAt = Date.now()
       const content = await withTimeout(
         chat({ modelId: String(modelId), prompt }),
         STEP_TIMEOUT_MS,
@@ -140,7 +141,8 @@ async function executeStep(
         modelId: String(modelId),
         source: 'workflow',
         inputTokens: llmService.countTokens(prompt),
-        outputTokens: llmService.countTokens(content)
+        outputTokens: llmService.countTokens(content),
+        latencyMs: Date.now() - startedAt
       })
       return content
     }

@@ -14,8 +14,7 @@ import {
 } from '../services/llm/index.js'
 import { success, fail } from '../utils/response.js'
 import { logger } from '../utils/logger.js'
-import { checkQuota, recordUsage } from '../services/billing/index.js'
-import { BillingQuotaError } from '../services/billing/types.js'
+import { recordUsage } from '../services/ai-resource/index.js'
 
 export const chatCompletionsSchema = z.object({
   modelId: z.string().min(1).optional(),
@@ -89,6 +88,7 @@ function handleNonStream(
   userId?: number
 ): Promise<void> {
   const { modelId, providerId, modelName, messages, ...rest } = body
+  const startedAt = Date.now()
   return llmService
     .chat({
       modelId,
@@ -115,7 +115,8 @@ function handleNonStream(
           source: 'chat',
           inputTokens: response.usage?.inputTokens ?? 0,
           outputTokens: response.usage?.outputTokens ?? 0,
-          cachedTokens: response.usage?.cachedTokens ?? 0
+          cachedTokens: response.usage?.cachedTokens ?? 0,
+          latencyMs: Date.now() - startedAt
         })
       }
     })
@@ -143,6 +144,7 @@ function handleStream(body: ChatBody, res: Response, req: Request, next: NextFun
   }
 
   const run = async (): Promise<void> => {
+    const startedAt = Date.now()
     try {
       const stream = llmService.stream({
         modelId,
@@ -171,7 +173,8 @@ function handleStream(body: ChatBody, res: Response, req: Request, next: NextFun
             source: 'chat',
             inputTokens: evt.usage.inputTokens ?? 0,
             outputTokens: evt.usage.outputTokens ?? 0,
-            cachedTokens: evt.usage.cachedTokens ?? 0
+            cachedTokens: evt.usage.cachedTokens ?? 0,
+            latencyMs: Date.now() - startedAt
           })
         }
         send(evt)
@@ -195,17 +198,6 @@ function handleStream(body: ChatBody, res: Response, req: Request, next: NextFun
 export const chatController = {
   async completions(req: Request, res: Response, next: NextFunction): Promise<void> {
     const body = req.body as ChatBody
-    // Phase 5（T36）：配额检查（无订阅不限制；超限 402）
-    try {
-      if (req.user?.userId !== undefined) await checkQuota(req.user.userId)
-    } catch (err) {
-      if (err instanceof BillingQuotaError) {
-        fail(res, err.message, 4020, err.statusCode)
-        return
-      }
-      next(err)
-      return
-    }
     if (body.stream) {
       handleStream(body, res, req, next)
       return

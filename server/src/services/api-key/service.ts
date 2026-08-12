@@ -4,14 +4,14 @@
  * 安全设计：
  *  - 明文只在创建时返回一次，DB 仅存 sha256 哈希
  *  - 校验 O(1)：hash(明文) 直接命中 key_hash 唯一索引
- *  - scope 限制可访问能力（agent 默认 / billing / all）
+ *  - scope 限制可访问能力（agent 默认 / all）
  *  - 支持过期时间与吊销（status=revoked）
  */
 
 import { createHash, randomBytes } from 'node:crypto'
 import { prisma } from '../../prisma.js'
 
-export type ApiKeyScope = 'agent' | 'billing' | 'all'
+export type ApiKeyScope = 'agent' | 'all'
 
 export interface ApiKeyInput {
   name: string
@@ -75,7 +75,7 @@ function toRecord(row: any): ApiKeyRecord {
 export async function createApiKey(userId: number, input: ApiKeyInput): Promise<CreatedApiKey> {
   if (!input.name?.trim()) throw new Error('API key name is required')
   const scope = input.scope ?? 'agent'
-  if (!['agent', 'billing', 'all'].includes(scope)) throw new Error(`Invalid scope: ${scope}`)
+  if (!['agent', 'all'].includes(scope)) throw new Error(`Invalid scope: ${scope}`)
 
   const plainKey = generatePlainKey()
   const created = await prisma.apiKey.create({
@@ -116,8 +116,7 @@ export async function updateApiKey(
     data.name = input.name.trim()
   }
   if (input.scope !== undefined) {
-    if (!['agent', 'billing', 'all'].includes(input.scope))
-      throw new Error(`Invalid scope: ${input.scope}`)
+    if (!['agent', 'all'].includes(input.scope)) throw new Error(`Invalid scope: ${input.scope}`)
     data.scope = input.scope
   }
 

@@ -15,8 +15,8 @@ function goTools() {
   router.push('/workspace/settings/tools')
 }
 
-function goBilling() {
-  router.push('/workspace/settings/billing')
+function goAiResources() {
+  router.push('/workspace/settings/ai-resources')
 }
 
 function goOrgs() {
@@ -80,8 +80,8 @@ function goApiKeys() {
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
-        <div class="settings__item" @click="goBilling">
-          <span class="settings__item-label">计费中心</span>
+        <div class="settings__item" @click="goAiResources">
+          <span class="settings__item-label">AI 资源</span>
           <svg
             width="16"
             height="16"

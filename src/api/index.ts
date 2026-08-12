@@ -2,7 +2,7 @@ export { userAPI } from './user'
 export { modelsAPI } from './models'
 export { providerAPI } from './provider'
 export { agentAPI, makeClientRunId } from './agent'
-export { billingAPI } from './billing'
+export { aiResourcesAPI } from './ai-resources'
 export { orgAPI } from './org'
 export { apiKeysAPI } from './api-keys'
 export type {
@@ -17,16 +17,12 @@ export type {
 } from './agent'
 export type { Provider, CreateProviderDTO, UpdateProviderDTO } from './provider'
 export type {
-  BillingPlanDef,
-  SubscriptionRecord,
-  QuotaStatus,
+  ResourceSummary,
   UsageSummary,
-  InvoiceRecord,
-  InvoiceLineItem,
-  ModelPriceRecord,
-  BillingSummaryData,
-  PageResult,
-  UsageSource
-} from './billing'
+  UsageBreakdown,
+  UsageSource,
+  ProviderResourceView,
+  ModelCatalogEntry
+} from './ai-resources'
 export type { OrgRecord, OrgDetail, OrgMemberRecord, OrgRole } from './org'
 export type { ApiKeyRecord, CreatedApiKey, ApiKeyScope } from './api-keys'

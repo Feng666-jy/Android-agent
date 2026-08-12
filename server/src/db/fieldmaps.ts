@@ -82,6 +82,8 @@ export const TABLES: Record<string, TableConfig> = {
       presencePenalty: 'presence_penalty',
       capabilities: 'capabilities',
       reasoningBudget: 'reasoning_budget',
+      inputPrice: 'input_price',
+      outputPrice: 'output_price',
       promptTemplate: 'prompt_template',
       customHeaders: 'custom_headers',
       customParams: 'custom_params',
@@ -457,46 +459,13 @@ export const TABLES: Record<string, TableConfig> = {
     },
     booleans: []
   },
-  billingPlan: {
-    table: 'billing_plans',
-    fields: {
-      id: 'id',
-      code: 'code',
-      name: 'name',
-      description: 'description',
-      priceMonthlyCents: 'price_monthly_cents',
-      currency: 'currency',
-      quotaJson: 'quota_json',
-      featuresJson: 'features_json',
-      isDefault: 'is_default',
-      enabled: 'enabled',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    },
-    booleans: ['isDefault', 'enabled']
-  },
-  subscription: {
-    table: 'subscriptions',
-    fields: {
-      id: 'id',
-      userId: 'user_id',
-      planId: 'plan_id',
-      status: 'status',
-      startedAt: 'started_at',
-      expiresAt: 'expires_at',
-      quotaResetAt: 'quota_reset_at',
-      metadataJson: 'metadata_json',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    },
-    booleans: []
-  },
-  usageEvent: {
-    table: 'usage_events',
+  usageRecord: {
+    table: 'usage_records',
     fields: {
       id: 'id',
       userId: 'user_id',
       orgId: 'org_id',
+      providerId: 'provider_id',
       modelId: 'model_id',
       runId: 'run_id',
       source: 'source',
@@ -504,43 +473,11 @@ export const TABLES: Record<string, TableConfig> = {
       outputTokens: 'output_tokens',
       cachedTokens: 'cached_tokens',
       totalTokens: 'total_tokens',
-      costCents: 'cost_cents',
-      currency: 'currency',
+      latencyMs: 'latency_ms',
+      estimatedCost: 'estimated_cost',
       createdAt: 'created_at'
     },
     booleans: []
-  },
-  invoice: {
-    table: 'invoices',
-    fields: {
-      id: 'id',
-      userId: 'user_id',
-      subscriptionId: 'subscription_id',
-      periodStart: 'period_start',
-      periodEnd: 'period_end',
-      amountCents: 'amount_cents',
-      currency: 'currency',
-      status: 'status',
-      lineItemsJson: 'line_items_json',
-      paidAt: 'paid_at',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    },
-    booleans: []
-  },
-  modelPrice: {
-    table: 'model_prices',
-    fields: {
-      id: 'id',
-      modelId: 'model_id',
-      currency: 'currency',
-      inputPerMillionCents: 'input_per_million_cents',
-      outputPerMillionCents: 'output_per_million_cents',
-      cachedDiscount: 'cached_discount',
-      enabled: 'enabled',
-      updatedAt: 'updated_at'
-    },
-    booleans: ['enabled']
   },
   apiKey: {
     table: 'api_keys',

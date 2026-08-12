@@ -5,7 +5,7 @@ import type { ApiResponse } from '@/types'
 
 // ---- 类型 ----
 
-export type ApiKeyScope = 'agent' | 'billing' | 'all'
+export type ApiKeyScope = 'agent' | 'all'
 
 export interface ApiKeyRecord {
   id: string

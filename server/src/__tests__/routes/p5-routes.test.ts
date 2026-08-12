@@ -1,5 +1,5 @@
 /**
- * Phase 5 路由 HTTP E2E — billing / orgs / api-keys
+ * Phase 5 路由 HTTP E2E — ai-resources / orgs / api-keys
  */
 process.env.JWT_SECRET = 'test-secret'
 
@@ -21,12 +21,12 @@ let otherToken: string
 let tempRoot: string
 
 beforeEach(async () => {
-  ;({ prisma, closeDatabase } = await import('../../../prisma.ts'))
+  ;({ prisma, closeDatabase } = await import('../../prisma.ts'))
   const { default: jwt } = await import('jsonwebtoken')
   const { mkdtempSync } = await import('node:fs')
   const { tmpdir } = await import('node:os')
   const { DatabaseSync } = await import('node:sqlite')
-  const { applyMigrations } = await import('../../../db/migrate.ts')
+  const { applyMigrations } = await import('../../db/migrate.ts')
   const { default: express } = await import('express')
 
   tempRoot = mkdtempSync(path.join(tmpdir(), 'p5-routes-'))
@@ -45,12 +45,12 @@ beforeEach(async () => {
   token = jwt.sign({ userId, username: user.username }, 'test-secret')
   otherToken = jwt.sign({ userId: otherUserId, username: other.username }, 'test-secret')
 
-  const billingRoutes = (await import('../../../routes/v2/billing.routes.ts')).default
-  const orgRoutes = (await import('../../../routes/v2/org.routes.ts')).default
-  const apiKeyRoutes = (await import('../../../routes/v2/api-keys.routes.ts')).default
+  const aiResourcesRoutes = (await import('../../routes/v2/ai-resources.routes.ts')).default
+  const orgRoutes = (await import('../../routes/v2/org.routes.ts')).default
+  const apiKeyRoutes = (await import('../../routes/v2/api-keys.routes.ts')).default
   app = express()
   app.use(express.json())
-  app.use('/api/v2/billing', billingRoutes)
+  app.use('/api/v2/ai-resources', aiResourcesRoutes)
   app.use('/api/v2/orgs', orgRoutes)
   app.use('/api/v2/api-keys', apiKeyRoutes)
   server = app.listen(0, '127.0.0.1')
@@ -72,72 +72,26 @@ function jsonAuth(t: string): Record<string, string> {
   return { ...auth(t), 'Content-Type': 'application/json' }
 }
 
-test('billing：套餐列表 → 订阅 → 用量写入 → 汇总 → 账单', async () => {
-  // 套餐
-  const plansRes = await fetch(`${baseUrl}/billing/plans`, { headers: auth(token) })
-  assert.equal(plansRes.status, 200)
-  const plans = (await plansRes.json()) as any
-  assert.equal(plans.data.items.length, 3)
-
-  // 订阅 pro
-  const subRes = await fetch(`${baseUrl}/billing/subscribe`, {
-    method: 'POST',
-    headers: jsonAuth(token),
-    body: JSON.stringify({ planCode: 'pro' })
-  })
-  assert.equal(subRes.status, 200)
-  const sub = (await subRes.json()) as any
-  assert.equal(sub.data.subscription.status, 'active')
-  assert.equal(sub.data.plan.code, 'pro')
-
-  // 直接写一条用量（模拟 LLM 埋点）
-  const { recordUsage } = await import('../../../services/billing/usage.ts')
+test('ai-resources：用量写入 → 汇总 → 模型目录 → 资源总览', async () => {
+  const { recordUsage } = await import('../../services/ai-resource/usage.ts')
   await recordUsage({ userId, modelId: 'm1', source: 'chat', inputTokens: 1234, outputTokens: 567 })
 
-  // 汇总
-  const sumRes = await fetch(`${baseUrl}/billing/usage`, { headers: auth(token) })
+  const sumRes = await fetch(`${baseUrl}/ai-resources/usage`, { headers: auth(token) })
   const sum = (await sumRes.json()) as any
   assert.equal(sum.data.requests, 1)
   assert.equal(sum.data.totalTokens, 1801)
+  assert.equal(sum.data.averageLatencyMs, 0)
 
-  // summary 带配额
-  const summaryRes = await fetch(`${baseUrl}/billing/summary`, { headers: auth(token) })
+  const modelRes = await fetch(`${baseUrl}/ai-resources/models`, { headers: auth(token) })
+  assert.equal(modelRes.status, 200)
+
+  const summaryRes = await fetch(`${baseUrl}/ai-resources/summary`, { headers: auth(token) })
+  assert.equal(summaryRes.status, 200)
   const summary = (await summaryRes.json()) as any
-  assert.equal(summary.data.quota.limited, true)
-  assert.equal(summary.data.quota.usedTokens, 1801)
-
-  // 生成账单（上月，可能为 0 也返回 draft）
-  const invRes = await fetch(`${baseUrl}/billing/invoices/generate`, {
-    method: 'POST',
-    headers: jsonAuth(token),
-    body: JSON.stringify({})
-  })
-  assert.equal(invRes.status, 200)
-  const inv = (await invRes.json()) as any
-  assert.equal(inv.data.status, 'draft')
-
-  // 账单列表
-  const invListRes = await fetch(`${baseUrl}/billing/invoices`, { headers: auth(token) })
-  const invList = (await invListRes.json()) as any
-  assert.equal(invList.data.total >= 1, true)
-})
-
-test('billing：模型价格设置与查询', async () => {
-  const provider = await prisma.provider.create({
-    data: { name: 't', baseUrl: 'http://x', protocol: 'OPENAI_COMPATIBLE', authType: 'NONE' }
-  })
-  const model = await prisma.model.create({
-    data: { providerId: provider.id, modelName: 'm-e2e', displayName: 'E2E' }
-  })
-  const putRes = await fetch(`${baseUrl}/billing/prices/${model.id}`, {
-    method: 'PUT',
-    headers: jsonAuth(token),
-    body: JSON.stringify({ inputPerMillionCents: 1000, outputPerMillionCents: 2000 })
-  })
-  assert.equal(putRes.status, 200)
-  const getRes = await fetch(`${baseUrl}/billing/prices/${model.id}`, { headers: auth(token) })
-  const price = (await getRes.json()) as any
-  assert.equal(price.data.inputPerMillionCents, 1000)
+  assert.equal(summary.data.usage.total.requests, 1)
+  assert.equal(summary.data.usage.today.requests, 1)
+  assert.ok(Array.isArray(summary.data.providers))
+  assert.ok(Array.isArray(summary.data.models))
 })
 
 test('orgs：创建 → 邀请成员 → 角色变更 → 详情', async () => {
@@ -197,13 +151,13 @@ test('api-keys：创建（明文一次）→ 列表 → 更新 → 吊销', asyn
   const createRes = await fetch(`${baseUrl}/api-keys`, {
     method: 'POST',
     headers: jsonAuth(token),
-    body: JSON.stringify({ name: 'E2E Key', scope: 'billing' })
+    body: JSON.stringify({ name: 'E2E Key', scope: 'all' })
   })
   assert.equal(createRes.status, 200)
   const created = (await createRes.json()) as any
   const keyId = created.data.record.id
   assert.ok(created.data.plainKey.startsWith('sk_'))
-  assert.equal(created.data.record.scope, 'billing')
+  assert.equal(created.data.record.scope, 'all')
 
   const listRes = await fetch(`${baseUrl}/api-keys`, { headers: auth(token) })
   const list = (await listRes.json()) as any
@@ -223,6 +177,6 @@ test('api-keys：创建（明文一次）→ 列表 → 更新 → 吊销', asyn
     headers: auth(token)
   })
   assert.equal(delRes.status, 200)
-  const after = (await (await fetch(`${baseUrl}/api-keys`, { headers: auth(token) })).json()) as any
+  const after = await (await fetch(`${baseUrl}/api-keys`, { headers: auth(token) })).json()
   assert.equal(after.data.items[0].status, 'revoked')
 })

@@ -74,9 +74,9 @@ test('verifyApiKey：有效/错误/吊销/过期', async () => {
 
 test('updateApiKey 改名/换 scope + 越权保护', async () => {
   const { record } = await createApiKey(userId, { name: '原名', scope: 'agent' })
-  const updated = await updateApiKey(userId, record.id, { name: '新名', scope: 'billing' })
+  const updated = await updateApiKey(userId, record.id, { name: '新名', scope: 'all' })
   assert.equal(updated.name, '新名')
-  assert.equal(updated.scope, 'billing')
+  assert.equal(updated.scope, 'all')
 
   const other = await prisma.user.create({
     data: { username: `key2${Date.now()}`, password: 'x', email: `key2${Date.now()}@t.com` }

@@ -64,6 +64,10 @@ model Model {
   capabilities          String?                                   // JSON array
   reasoningBudget       Int?     @map("reasoning_budget")
 
+  // 计价（成本估算：USD / 每百万 tokens）
+  inputPrice            Float    @default(0) @map("input_price")
+  outputPrice           Float    @default(0) @map("output_price")
+
   // 自定义
   promptTemplate        String?  @map("prompt_template")
   customHeaders         String?  @map("custom_headers")           // JSON map
@@ -169,9 +173,7 @@ model User {
   conversations Conversation[]
     organizations Organization[] @relation("OrgOwner")
     memberships   OrgMember[]
-    subscriptions Subscription[]
-    usageEvents   UsageEvent[]
-    invoices      Invoice[]
+    usageRecords  UsageRecord[]
     apiKeys       ApiKey[]
 
   @@map("users")
@@ -560,104 +562,30 @@ model OrgMember {
   @@map("org_members")
 }
 
-/// BillingPlan（套餐 — Phase 5 T36：free / pro / enterprise）
-model BillingPlan {
-  id                 String  @id @default(cuid())
-  code               String  @unique
-  name               String
-  description        String  @default("")
-  priceMonthlyCents  Int     @default(0) @map("price_monthly_cents")
-  currency           String  @default("CNY")
-  quotaJson          String  @default("{}") @map("quota_json")
-  featuresJson       String  @default("[]") @map("features_json")
-  isDefault          Boolean @default(false) @map("is_default")
-  enabled            Boolean @default(true)
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
-
-  subscriptions Subscription[]
-
-  @@map("billing_plans")
-}
-
-/// Subscription（用户订阅）
-model Subscription {
-  id           String   @id @default(cuid())
-  userId       Int      @map("user_id")
-  planId       String   @map("plan_id")
-  status       String   @default("active") // active | trialing | expired | canceled
-  startedAt    DateTime @default(now()) @map("started_at")
-  expiresAt    DateTime? @map("expires_at")
-  quotaResetAt DateTime @default(now()) @map("quota_reset_at")
-  metadataJson String   @default("{}") @map("metadata_json")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan BillingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
-
-  @@index([userId, status])
-  @@map("subscriptions")
-}
-
-/// UsageEvent（用户级用量事件 — 事件溯源，读时聚合，不可变）
-model UsageEvent {
-  id           String   @id @default(cuid())
-  userId       Int      @map("user_id")
-  orgId        String?  @map("org_id")
-  modelId      String?  @map("model_id")
-  runId        String?  @map("run_id")
-  source       String   @default("chat") // chat | agent | workflow | api
-  inputTokens  Int      @default(0) @map("input_tokens")
-  outputTokens Int      @default(0) @map("output_tokens")
-  cachedTokens Int      @default(0) @map("cached_tokens")
-  totalTokens  Int      @default(0) @map("total_tokens")
-  costCents    Int      @default(0) @map("cost_cents")
-  currency     String   @default("CNY")
-  createdAt    DateTime @default(now()) @map("created_at")
+/// UsageRecord（用量记录 — AI Resource：事件溯源，读时聚合，不可变）
+/// 成本按模型计价列写入时估算（estimated_cost），改价不影响历史。
+model UsageRecord {
+  id            String   @id @default(cuid())
+  userId        Int      @map("user_id")
+  orgId         String?  @map("org_id")
+  providerId    String?  @map("provider_id")
+  modelId       String?  @map("model_id")
+  runId         String?  @map("run_id")
+  source        String   @default("chat") // chat | agent | workflow | api
+  inputTokens   Int      @default(0) @map("input_tokens")
+  outputTokens  Int      @default(0) @map("output_tokens")
+  cachedTokens  Int      @default(0) @map("cached_tokens")
+  totalTokens   Int      @default(0) @map("total_tokens")
+  latencyMs     Int      @default(0) @map("latency_ms")
+  estimatedCost Float    @default(0) @map("estimated_cost") // USD，成本估算
+  createdAt     DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([orgId, createdAt])
   @@index([modelId])
-  @@map("usage_events")
-}
-
-/// Invoice（月度账单）
-model Invoice {
-  id             String   @id @default(cuid())
-  userId         Int      @map("user_id")
-  subscriptionId String?  @map("subscription_id")
-  periodStart    DateTime @map("period_start")
-  periodEnd      DateTime @map("period_end")
-  amountCents    Int      @default(0) @map("amount_cents")
-  currency       String   @default("CNY")
-  status         String   @default("draft") // draft | issued | paid | void
-  lineItemsJson  String   @default("[]") @map("line_items_json")
-  paidAt         DateTime? @map("paid_at")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, periodStart])
-  @@map("invoices")
-}
-
-/// ModelPrice（模型计价 — 每百万 token 单价，单位：分）
-model ModelPrice {
-  id                      String  @id @default(cuid())
-  modelId                 String  @map("model_id")
-  currency                String  @default("CNY")
-  inputPerMillionCents    Int     @default(0) @map("input_per_million_cents")
-  outputPerMillionCents   Int     @default(0) @map("output_per_million_cents")
-  cachedDiscount          Float   @default(0.9) @map("cached_discount")
-  enabled                 Boolean @default(true)
-  updatedAt               DateTime @updatedAt @map("updated_at")
-
-  @@unique([modelId, currency])
-  @@map("model_prices")
+  @@map("usage_records")
 }
 
 /// ApiKey（用户 API Key — 只存哈希，明文仅创建时返回一次）
@@ -667,7 +595,7 @@ model ApiKey {
   name       String
   prefix     String
   keyHash    String    @unique @map("key_hash")
-  scope      String    @default("agent") // agent | billing | all
+  scope      String    @default("agent") // agent | all
   status     String    @default("active") // active | revoked
   lastUsedAt DateTime? @map("last_used_at")
   expiresAt  DateTime? @map("expires_at")

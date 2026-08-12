@@ -27,7 +27,7 @@ import {
 import { loadSkills } from '../skills/loader.js'
 import { buildSkillPrompt } from '../skills/injector.js'
 import { getRelevantMemories, renderMemoryBlock } from '../memory/index.js'
-import { recordUsage } from '../billing/usage.js'
+import { recordUsage } from '../ai-resource/usage.js'
 import { compactRunToMemory } from '../memory/compactor.js'
 import { saveMemory } from '../memory/store.js'
 import { LLMPlanner } from './planner.js'

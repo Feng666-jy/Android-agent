@@ -118,10 +118,10 @@ const router = createRouter({
               meta: { title: '工具管理' }
             },
             {
-              path: 'billing',
-              name: 'billing',
-              component: () => import('@/views/billing/BillingView.vue'),
-              meta: { title: '计费中心' }
+              path: 'ai-resources',
+              name: 'ai-resources',
+              component: () => import('@/views/ai-resources/AiResourcesView.vue'),
+              meta: { title: 'AI 资源' }
             },
             {
               path: 'orgs',
