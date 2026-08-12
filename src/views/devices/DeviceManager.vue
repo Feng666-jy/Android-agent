@@ -10,7 +10,7 @@ const connected = ref(false)
 const myDeviceId = ref('')
 const statusText = ref('未连接')
 
-const serverUrl = ref('ws://192.168.1.100:3000')
+const serverUrl = ref('')
 const token = ref('')
 const loginForm = ref({ username: '', password: '' })
 const gettingToken = ref(false)
@@ -41,6 +41,10 @@ async function loadDevices() {
 }
 
 async function fetchToken() {
+  if (!serverUrl.value.trim()) {
+    showToast('请先填写服务器地址（ws://电脑IP:3000）')
+    return
+  }
   if (!loginForm.value.username || !loginForm.value.password) {
     showToast('请输入用户名和密码')
     return
@@ -78,6 +82,10 @@ function normalizeServerUrl(raw: string): string {
 }
 
 async function connect() {
+  if (!serverUrl.value.trim()) {
+    showToast('请先填写服务器地址（ws://电脑IP:3000）')
+    return
+  }
   if (!isNative.value) {
     showToast('请在手机 App 内操作（浏览器无法调用原生桥）')
     return
