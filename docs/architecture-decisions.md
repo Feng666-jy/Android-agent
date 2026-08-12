@@ -35,6 +35,7 @@ SQLite (node:sqlite, 零原生依赖)
 - 支持范围见 `server/src/db/SUPPORTED.md`（不含 relation include / nested create / groupBy 等）；
 - 新增表必须走增量迁移 + `fieldmaps.ts` 登记，禁止修改已应用迁移；
 - 未来若需要完整 ORM 能力，可在兼容层之上扩展，无需改 Service 层。
+- 已知限制：`node:sqlite` 的 DatabaseSync 为**同步 API**，单连接串行执行，长查询或高并发下会阻塞事件循环；当前单用户 / 小规模场景可接受。未来若出现并发瓶颈，缓解方向为 worker_threads 隔离、请求队列或独立读写连接（WAL），届时需评估是否替换/包装底层驱动。
 
 ---
 
