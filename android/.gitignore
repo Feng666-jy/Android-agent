@@ -1,0 +1,10 @@
+# Android 构建产物 / IDE 本地配置（不入库）
+*.iml
+.gradle
+local.properties
+.idea
+.DS_Store
+build/
+captures
+.externalNativeBuild
+.cxx
